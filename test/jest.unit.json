@@ -15,5 +15,9 @@
     "^@domain/(.*)$": "<rootDir>/src/domain/$1",
     "^@infrastructure/(.*)$": "<rootDir>/src/infrastructure/$1",
     "^@api/(.*)$": "<rootDir>/src/api/$1"
-  }
+  },
+  "coveragePathIgnorePatterns": [
+    "/node_modules/",
+    "/dist/"
+  ]
 }

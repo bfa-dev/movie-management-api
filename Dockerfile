@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY package*.json ./
 
+RUN rm -rf /application/node_modules
+
 RUN npm install
 
 COPY . .

@@ -11,6 +11,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "${POSTGRES_PORT}:5432"
+    networks:
+      - movie-management-network
 
   app:
     build:
@@ -21,7 +23,7 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION_TIME: ${JWT_EXPIRATION_TIME}
       INITIAL_MANAGER_EMAIL: ${INITIAL_MANAGER_EMAIL}
@@ -30,6 +32,20 @@ services:
       INITIAL_USER_EMAIL: ${INITIAL_USER_EMAIL}
       INITIAL_USER_PASSWORD: ${INITIAL_USER_PASSWORD}
       INITIAL_USER_USERNAME: ${INITIAL_USER_USERNAME}
+    networks:
+      - movie-management-network
+
+  local-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      - movie-management-network
+
 
   test-db:
     image: postgres:13
@@ -39,6 +55,10 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "${TEST_DB_PORT}:5432"
+
+networks:
+  movie-management-network:
+    driver: bridge
 
 volumes:
   postgres_data:
