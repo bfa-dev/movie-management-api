@@ -228,6 +228,10 @@ This command will list all running Docker containers. You should see containers 
 To install the project dependencies, navigate to the project directory and run the following command:
 
 ```bash
+nvm use
+```
+
+```bash
 npm install
 ```
 
