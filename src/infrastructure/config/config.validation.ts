@@ -5,7 +5,6 @@ export const configValidationSchema = Joi.object({
     .valid('dev', 'prod', 'test')
     .default('dev'),
   DATABASE_URL: Joi.string().required(),
-  REDIS_URL: Joi.string().required(),
   JWT_SECRET: Joi.string().required(),
   JWT_EXPIRATION_TIME: Joi.string().default('1h'),
 });

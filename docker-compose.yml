@@ -12,6 +12,25 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_TIME: ${JWT_EXPIRATION_TIME}
+      INITIAL_MANAGER_EMAIL: ${INITIAL_MANAGER_EMAIL}
+      INITIAL_MANAGER_PASSWORD: ${INITIAL_MANAGER_PASSWORD}
+      INITIAL_MANAGER_USERNAME: ${INITIAL_MANAGER_USERNAME}
+      INITIAL_USER_EMAIL: ${INITIAL_USER_EMAIL}
+      INITIAL_USER_PASSWORD: ${INITIAL_USER_PASSWORD}
+      INITIAL_USER_USERNAME: ${INITIAL_USER_USERNAME}
+
   test-db:
     image: postgres:13
     environment:
@@ -20,7 +39,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "${TEST_DB_PORT}:5432"
-
 
 volumes:
   postgres_data:
