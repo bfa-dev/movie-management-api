@@ -324,12 +324,24 @@ $ npm run test:cov:unit
 $ npm run test:e2e
 ```
 
+# End-to-End Test Automation Commands
+
+The following commands are executed automatically when running the E2E tests. After the tests have completed, please ensure that the `test-db` stops before proceeding with any other tasks:
+
+```json
+"pretest:e2e": "docker compose up -d test-db",
+"test:e2e": "NODE_ENV=test jest --config ./test/jest-e2e.json; npm run posttest:e2e",
+"posttest:e2e": "docker compose stop test-db && sleep 5 && docker compose rm -f test-db"
+```
+
+
+- ## E2E Tests Coverage:
+
 ```bash
 # e2e tests coverage
 $ npm run test:cov:e2e
 ```
 
-- ## E2E Tests Coverage:
 ![Unit Test](./assets/e2e.test.cov.png)
 
 ![Unit Test2](./assets/e2e.test.cov2.png)
