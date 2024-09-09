@@ -9,7 +9,7 @@ export class TicketRepository implements ITicketRepository {
   constructor(
     @InjectRepository(Ticket)
     private readonly repository: Repository<Ticket>,
-  ) { }
+  ) {}
 
   create(ticket: DeepPartial<Ticket>): Ticket {
     return this.repository.create(ticket);

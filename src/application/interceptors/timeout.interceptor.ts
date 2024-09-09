@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 class TimeoutInterceptor implements NestInterceptor {
-  constructor(private configService: ConfigService) { }
+  constructor(private configService: ConfigService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const timeoutValue = this.configService.get<number>('timeout');

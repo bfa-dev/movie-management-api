@@ -5,7 +5,6 @@ import { Session } from '../../src/domain/sessions/entities/session.entity';
 import { TimeSlot } from '../../src/domain/sessions/enums/time.slot.enum';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Movie } from '../../src/domain/movies/entities/movie.entity';
-import { BadRequestException } from '@nestjs/common';
 
 describe('SessionsService', () => {
   let service: SessionsService;
@@ -48,18 +47,20 @@ describe('SessionsService', () => {
       const result = await service.addSession(createSessionDto, movie);
 
       expect(result).toBeDefined();
-      expect(repository.save).toHaveBeenCalledWith(expect.objectContaining({
-        date: new Date(createSessionDto.date),
-        timeSlot: createSessionDto.timeSlot,
-        roomNumber: createSessionDto.roomNumber,
-        movie: movie,
-      }));
+      expect(repository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          date: new Date(createSessionDto.date),
+          timeSlot: createSessionDto.timeSlot,
+          roomNumber: createSessionDto.roomNumber,
+          movie: movie,
+        }),
+      );
     });
 
     it('should create a session with correct properties', async () => {
       const movie: Movie = {
         id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66',
-        name: 'Test Movie'
+        name: 'Test Movie',
       } as Movie;
       const createSessionDto = {
         date: '2024-01-01',
@@ -67,12 +68,7 @@ describe('SessionsService', () => {
         roomNumber: 1,
       };
 
-      const savedSession = new Session(
-        new Date(createSessionDto.date),
-        createSessionDto.timeSlot,
-        createSessionDto.roomNumber,
-        movie
-      );
+      const savedSession = new Session(new Date(createSessionDto.date), createSessionDto.timeSlot, createSessionDto.roomNumber, movie);
 
       jest.spyOn(repository, 'save').mockResolvedValue(savedSession);
 
@@ -108,9 +104,8 @@ describe('SessionsService', () => {
     it('should return false if no session was deleted', async () => {
       jest.spyOn(repository, 'delete').mockResolvedValue({ affected: 0 } as any);
 
-      const result = await service.deleteSession('4a7962f8-18f2-4c43-bbf3-34c1e5147c66');
+      await expect(service.deleteSession('4a7962f8-18f2-4c43-bbf3-34c1e5147c66')).rejects.toThrow('Session not found');
 
-      expect(result).toEqual({ result: false });
       expect(repository.delete).toHaveBeenCalledWith('4a7962f8-18f2-4c43-bbf3-34c1e5147c66');
     });
   });
@@ -125,43 +120,40 @@ describe('SessionsService', () => {
       expect(repository.delete).toHaveBeenCalledWith({ movie: { id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66' } });
     });
 
-    it('should return false if no sessions were deleted', async () => {
+    it('should throw an error if no sessions were deleted', async () => {
       jest.spyOn(repository, 'delete').mockResolvedValue({ affected: 0 } as any);
 
-      const result = await service.deleteAllSessions('4a7962f8-18f2-4c43-bbf3-34c1e5147c66');
+      await expect(service.deleteAllSessions('4a7962f8-18f2-4c43-bbf3-34c1e5147c66')).rejects.toThrow('Movie has no sessions to delete');
 
-      expect(result).toEqual({ result: false });
       expect(repository.delete).toHaveBeenCalledWith({ movie: { id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66' } });
     });
 
     it('should handle errors when deleting sessions', async () => {
       jest.spyOn(repository, 'delete').mockRejectedValue(new Error('Database error'));
 
-      await expect(
-        service.deleteAllSessions('4a7962f8-18f2-4c43-bbf3-34c1e5147c66'))
-        .rejects.toThrow('Database error');
+      await expect(service.deleteAllSessions('4a7962f8-18f2-4c43-bbf3-34c1e5147c66')).rejects.toThrow('Database error');
     });
   });
 
   describe('findOneWithRelations', () => {
     it('should find a session with relations', async () => {
       const session: Session = {
-        id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66'
+        id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66',
       } as Session;
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(session);
 
       const result = await service.findOneWithRelations({
         where: {
-          id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66'
-        }
+          id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66',
+        },
       });
 
       expect(result).toEqual(session);
       expect(repository.findOne).toHaveBeenCalledWith({
         where: {
-          id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66'
-        }
+          id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66',
+        },
       });
     });
 
@@ -185,7 +177,7 @@ describe('SessionsService', () => {
           id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66',
           name: 'Test Movie',
           ageRestriction: 13,
-          isActive: true
+          isActive: true,
         } as Movie,
         date: new Date('2024-01-01'),
         timeSlot: '10:00-12:00' as TimeSlot,
@@ -196,14 +188,14 @@ describe('SessionsService', () => {
 
       const result = await service.findOneWithRelations({
         where: { id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66' },
-        relations: ['movie']
+        relations: ['movie'],
       });
 
       expect(result).toEqual(session);
       expect(result.movie).toBeDefined();
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66' },
-        relations: ['movie']
+        relations: ['movie'],
       });
     });
 
@@ -214,14 +206,14 @@ describe('SessionsService', () => {
         timeSlot: '10:00-12:00' as TimeSlot,
         roomNumber: 1,
         movie: { id: 'movie-1', name: 'Test Movie' } as Movie,
-        tickets: []
+        tickets: [],
       };
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(session);
 
       const result = await service.findOneWithRelations({
         where: { id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66' },
-        relations: ['movie']
+        relations: ['movie'],
       });
 
       expect(result).toEqual(session);
@@ -236,9 +228,11 @@ describe('SessionsService', () => {
     it('should handle errors when finding a session', async () => {
       jest.spyOn(repository, 'findOne').mockRejectedValue(new Error('Database error'));
 
-      await expect(service.findOneWithRelations({
-        where: { id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66' }
-      })).rejects.toThrow('Database error');
+      await expect(
+        service.findOneWithRelations({
+          where: { id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66' },
+        }),
+      ).rejects.toThrow('Database error');
     });
   });
 
@@ -249,12 +243,7 @@ describe('SessionsService', () => {
       timeSlot: '10:00-12:00' as TimeSlot,
       roomNumber: 1,
     };
-    const session = new Session(
-      new Date(createSessionDto.date),
-      createSessionDto.timeSlot,
-      createSessionDto.roomNumber,
-      movie
-    );
+    const session = new Session(new Date(createSessionDto.date), createSessionDto.timeSlot, createSessionDto.roomNumber, movie);
 
     jest.spyOn(repository, 'save').mockResolvedValue(session);
 

@@ -8,12 +8,10 @@ export async function authenticateUser(app: INestApplication, emailEnvKey: strin
   const email = configService.get(emailEnvKey);
   const password = configService.get(passwordEnvKey);
 
-  const response = await request(app.getHttpServer())
-    .post('/auth/login')
-    .send({
-      email: email,
-      password: password,
-    });
+  const response = await request(app.getHttpServer()).post('/auth/login').send({
+    email: email,
+    password: password,
+  });
 
   return response.body.data;
 }

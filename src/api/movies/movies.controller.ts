@@ -1,19 +1,19 @@
-import { Controller, Post, Put, Delete, Body, Param, Get, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Post, Put, Delete, Body, Param, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { MoviesService } from '../../application/movies/movies.service';
 import { Roles } from '../../application/decorators/roles.decorator';
 import { Role } from '../../domain/auth/enums/role.enum';
 import { CreateMovieDto } from './dto/create-movie.dto';
-import { CreateSessionDto } from '../sessions/dto/create-session.dto';
 import { BulkCreateMovieDto, BulkDeleteMovieDto } from './dto/bulk/bulk-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { ListMoviesDto } from './dto/list-movies.dto';
 import { Public } from '@application/decorators/public.decorator';
 import { GenericResponseDto } from '../shared/dto/generic-response.dto';
 
 @ApiTags('movies')
 @Controller('movies')
 export class MoviesController {
-  constructor(private moviesService: MoviesService) { }
+  constructor(private moviesService: MoviesService) {}
 
   @Public()
   @Get()
@@ -23,16 +23,8 @@ export class MoviesController {
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'] })
   @ApiQuery({ name: 'name', required: false, type: String })
   @ApiQuery({ name: 'ageRestriction', required: false, type: Number })
-  async listMovies(
-    @Query('sortBy') sortBy?: string,
-    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
-    @Query('name') name?: string,
-    @Query('ageRestriction') ageRestriction?: number
-  ) {
-    const filter: any = {};
-    if (name) filter.name = name;
-    if (ageRestriction) filter.ageRestriction = ageRestriction;
-    const movies = await this.moviesService.listActiveMovies(sortBy, sortOrder, filter);
+  async listMovies(@Query() listMoviesDto: ListMoviesDto) {
+    const movies = await this.moviesService.listActiveMovies(listMoviesDto);
     return new GenericResponseDto(movies, 'Return all active movies.');
   }
 
@@ -60,10 +52,7 @@ export class MoviesController {
   @Roles(Role.MANAGER)
   @ApiOperation({ summary: 'Update a movie' })
   @ApiResponse({ status: 200, description: 'The movie has been successfully updated.' })
-  async updateMovie(
-    @Param('id') id: string,
-    @Body() updateMovieDto: UpdateMovieDto
-  ) {
+  async updateMovie(@Param('id') id: string, @Body() updateMovieDto: UpdateMovieDto) {
     const movie = await this.moviesService.updateMovie(id, updateMovieDto);
     return new GenericResponseDto(movie, 'The movie has been successfully updated.');
   }
@@ -76,25 +65,6 @@ export class MoviesController {
   async deleteMovie(@Param('id') id: string) {
     const movie = await this.moviesService.deleteMovie(id);
     return new GenericResponseDto(movie, 'The movie has been successfully deleted.');
-  }
-
-  @Post(':id/sessions')
-  @ApiBearerAuth()
-  @Roles(Role.MANAGER)
-  @ApiOperation({ summary: 'Add a new session to a movie' })
-  @ApiResponse({ status: 201, description: 'The session has been successfully added.' })
-  @ApiResponse({ status: 409, description: 'This room is already booked for the given date and time slot.' })
-  async addSession(
-    @Param('id') movieId: string,
-    @Body() createSessionDto: CreateSessionDto
-  ) {
-    const session = await this.moviesService.addSession(
-      movieId,
-      new Date(createSessionDto.date),
-      createSessionDto.timeSlot,
-      createSessionDto.roomNumber
-    );
-    return new GenericResponseDto(session, 'The session has been successfully added.');
   }
 
   @Post('bulk-add')
@@ -112,8 +82,7 @@ export class MoviesController {
   @Roles(Role.MANAGER)
   @ApiOperation({ summary: 'Bulk delete movies' })
   @ApiResponse({ status: 200, description: 'The movies have been successfully deleted.' })
-  async bulkDeleteMovies(@Body() bulkDeleteMovieDto: any) {
-    console.log(bulkDeleteMovieDto, 'BULK DELETE MOVIE DTO');
+  async bulkDeleteMovies(@Body() bulkDeleteMovieDto: BulkDeleteMovieDto) {
     const movies = await this.moviesService.bulkDeleteMovies(bulkDeleteMovieDto.movieIds);
     return new GenericResponseDto(movies, 'The movies have been successfully deleted.');
   }

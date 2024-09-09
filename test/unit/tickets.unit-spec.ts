@@ -6,12 +6,7 @@ import { User } from '../../src/domain/users/entities/user.entity';
 import { Ticket } from '../../src/domain/tickets/entities/ticket.entity';
 import { Session } from '../../src/domain/sessions/entities/session.entity';
 import { TimeSlot } from '../../src/domain/sessions/enums/time.slot.enum';
-import {
-  MovieIsNotActiveError,
-  UserNotOldEnoughError,
-  TicketAlreadyUsedError,
-  TicketNotFoundError,
-} from '../../src/domain/exceptions';
+import { MovieIsNotActiveError, UserNotOldEnoughError, TicketAlreadyUsedError, TicketNotFoundError } from '../../src/domain/exceptions';
 import { Movie } from '../../src/domain/movies/entities/movie.entity';
 
 describe('TicketsService', () => {
@@ -37,6 +32,7 @@ describe('TicketsService', () => {
           provide: SessionsService,
           useValue: {
             findOneWithRelations: jest.fn(),
+            findOneById: jest.fn(),
           },
         },
       ],
@@ -57,6 +53,8 @@ describe('TicketsService', () => {
       const session: Session = {
         id: 'fdc17c48-135d-4702-9f9b-bbe499412516',
         movie: { id: 'fdc17c48-135d-4702-9f9b-bbe499412516', isActive: true, ageRestriction: 18 } as any,
+        date: new Date(Date.now() + 86400000),
+        timeSlot: '10:00-12:00' as TimeSlot,
       } as Session;
 
       jest.spyOn(sessionsService, 'findOneWithRelations').mockResolvedValue(session);
@@ -84,10 +82,7 @@ describe('TicketsService', () => {
 
       jest.spyOn(sessionsService, 'findOneWithRelations').mockResolvedValue(session);
 
-      await expect(ticketsService.buyTicket(
-        user,
-        'fdc17c48-135d-4702-9f9b-bbe499412516'
-      )).rejects.toThrow(MovieIsNotActiveError);
+      await expect(ticketsService.buyTicket(user, 'fdc17c48-135d-4702-9f9b-bbe499412516')).rejects.toThrow(MovieIsNotActiveError);
     });
 
     it('should throw UserNotOldEnoughError if user is not old enough', async () => {
@@ -99,10 +94,7 @@ describe('TicketsService', () => {
 
       jest.spyOn(sessionsService, 'findOneWithRelations').mockResolvedValue(session);
 
-      await expect(ticketsService.buyTicket(
-        user,
-        'fdc17c48-135d-4702-9f9b-bbe499412516'
-      )).rejects.toThrow(UserNotOldEnoughError);
+      await expect(ticketsService.buyTicket(user, 'fdc17c48-135d-4702-9f9b-bbe499412516')).rejects.toThrow(UserNotOldEnoughError);
     });
   });
 
@@ -113,16 +105,23 @@ describe('TicketsService', () => {
         id: '4a736f64-616c-69-6173-696f6e',
         userId: '4a736f64-616c-69-6173-696f6e',
         used: false,
+        sessionId: 'session-id',
       } as Ticket;
+      const session: Session = {
+        id: 'session-id',
+        date: new Date(Date.now() + 86400000),
+        timeSlot: '10:00-12:00' as TimeSlot,
+      } as Session;
 
       jest.spyOn(ticketRepository, 'findOneWithRelations').mockResolvedValue(ticket);
-      jest.spyOn(ticketRepository, 'save').mockResolvedValue(ticket);
+      jest.spyOn(ticketRepository, 'save').mockResolvedValue({ ...ticket, used: true } as Ticket);
+      jest.spyOn(sessionsService, 'findOneById').mockResolvedValue(session);
 
       const result = await ticketsService.watchMovie(user, { ticketId: '4a736f64-616c-69-6173-696f6e' });
 
       expect(result).toBeDefined();
       expect(result.used).toBe(true);
-      expect(ticketRepository.save).toHaveBeenCalledWith(ticket);
+      expect(ticketRepository.save).toHaveBeenCalledWith(expect.objectContaining({ id: '4a736f64-616c-69-6173-696f6e', used: true }));
     });
 
     it('should throw TicketAlreadyUsedError if the ticket is already used', async () => {
@@ -135,10 +134,7 @@ describe('TicketsService', () => {
 
       jest.spyOn(ticketRepository, 'findOneWithRelations').mockResolvedValue(ticket);
 
-      await expect(ticketsService.watchMovie(
-        user,
-        { ticketId: '4a736f64-616c-69-6173-696f6e' }
-      )).rejects.toThrow(TicketAlreadyUsedError);
+      await expect(ticketsService.watchMovie(user, { ticketId: '4a736f64-616c-69-6173-696f6e' })).rejects.toThrow(TicketAlreadyUsedError);
     });
 
     it('should throw TicketNotFoundError if the ticket does not exist', async () => {
@@ -146,10 +142,7 @@ describe('TicketsService', () => {
 
       jest.spyOn(ticketRepository, 'findOneWithRelations').mockResolvedValue(null);
 
-      await expect(ticketsService.watchMovie(
-        user,
-        { ticketId: '4a736f64-616c-69-6173-696f6e' }
-      )).rejects.toThrow(TicketNotFoundError);
+      await expect(ticketsService.watchMovie(user, { ticketId: '4a736f64-616c-69-6173-696f6e' })).rejects.toThrow(TicketNotFoundError);
     });
   });
 
@@ -160,17 +153,18 @@ describe('TicketsService', () => {
       email: 'user@example.com',
       role: 'customer',
     } as User;
-    const session = new Session(new Date(), '10:00-12:00' as TimeSlot, 1, { isActive: true } as Movie);
+    const session = new Session(new Date(Date.now() + 86400000), '10:00-12:00' as TimeSlot, 1, { isActive: true, id: 'movie-id' } as Movie);
     jest.spyOn(sessionsService, 'findOneWithRelations').mockResolvedValue(session);
-    jest.spyOn(ticketsService, 'create').mockResolvedValue({ id: 'ticket1' } as Ticket);
+    jest.spyOn(ticketRepository, 'create').mockReturnValue({ id: 'ticket1' } as Ticket);
+    jest.spyOn(ticketRepository, 'save').mockResolvedValue({ id: 'ticket1' } as Ticket);
 
     const result = await ticketsService.buyTicket(user, 'fdc17c48-135d-4702-9f9b-bbe499412516');
 
     expect(result.id).toBe('ticket1');
-    expect(ticketsService.create).toHaveBeenCalledWith({
+    expect(ticketRepository.create).toHaveBeenCalledWith({
       userId: '4a736f64-616c-69-6173-696f6e',
       sessionId: 'fdc17c48-135d-4702-9f9b-bbe499412516',
-      movieId: session.movie.id,
+      movieId: 'movie-id',
       used: false,
     });
   });
@@ -186,16 +180,21 @@ describe('TicketsService', () => {
       id: '4a736f64-616c-69-6173-696f6e',
       userId: '4a736f64-616c-69-6173-696f6e',
       used: false,
+      sessionId: 'session-id',
     } as Ticket;
+    const session: Session = {
+      id: 'session-id',
+      date: new Date(Date.now() + 86400000),
+      timeSlot: '10:00-12:00' as TimeSlot,
+    } as Session;
 
     jest.spyOn(ticketRepository, 'findOneWithRelations').mockResolvedValue(ticket);
     jest.spyOn(ticketRepository, 'save').mockResolvedValue({ ...ticket, used: true } as Ticket);
+    jest.spyOn(sessionsService, 'findOneById').mockResolvedValue(session);
 
     const result = await ticketsService.watchMovie(user, { ticketId: '4a736f64-616c-69-6173-696f6e' });
 
     expect(result.used).toBe(true);
-    expect(ticketRepository.save).toHaveBeenCalledWith(
-      expect.objectContaining({ id: '4a736f64-616c-69-6173-696f6e', used: true })
-    );
+    expect(ticketRepository.save).toHaveBeenCalledWith(expect.objectContaining({ id: '4a736f64-616c-69-6173-696f6e', used: true }));
   });
 });

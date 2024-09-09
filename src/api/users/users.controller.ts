@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from '@application/users/users.service';
 import { Roles } from '@application/decorators/roles.decorator';
@@ -10,7 +10,7 @@ import { User } from '@domain/users/entities/user.entity';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) { }
+  constructor(private usersService: UsersService) {}
 
   @Get('profile')
   @ApiBearerAuth()

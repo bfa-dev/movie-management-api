@@ -5,18 +5,21 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
+import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private reflector: Reflector, private jwtService: JwtService, private configService: ConfigService) {
+  constructor(
+    private reflector: Reflector,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private logger: PinoLogger,
+  ) {
     super();
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [context.getHandler(), context.getClass()]);
     if (isPublic) {
       return true;
     }
@@ -34,9 +37,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
       request['user'] = payload;
     } catch (error) {
+      this.logger.error(error);
       throw new UnauthorizedException();
     }
-
 
     return true;
   }

@@ -74,6 +74,16 @@ const ERRORS = {
     error: 'TICKET_DOES_NOT_BELONG_TO_USER',
     message: 'Ticket does not belong to user',
   },
+  SESSION_ALREADY_PASSED: {
+    code: 16,
+    error: 'SESSION_ALREADY_PASSED',
+    message: 'Session has already passed',
+  },
+  MOVIE_HAS_NO_SESSIONS_TO_DELETE: {
+    code: 17,
+    error: 'MOVIE_HAS_NO_SESSIONS_TO_DELETE',
+    message: 'Movie has no sessions to delete',
+  },
 };
 
 export { ERRORS };

@@ -12,7 +12,7 @@ export class Movie {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column() // movies can have the same name
   name: string;
 
   @Column()
@@ -21,9 +21,9 @@ export class Movie {
   @Column({ default: true })
   isActive: boolean;
 
-  @OneToMany(() => Session, session => session.movie)
+  @OneToMany(() => Session, (session) => session.movie)
   sessions: Session[];
 
-  @OneToMany(() => Ticket, ticket => ticket.movieId)
+  @OneToMany(() => Ticket, (ticket) => ticket.movieId)
   tickets: Ticket[];
 }

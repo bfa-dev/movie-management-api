@@ -8,9 +8,7 @@ import { MovieRepository } from '@infrastructure/repositories/movie.repository';
 import { SessionRepository } from '@infrastructure/repositories/session.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Movie, Session]),
-  ],
+  imports: [TypeOrmModule.forFeature([Movie, Session])],
   controllers: [MoviesController],
   providers: [
     MoviesService,
@@ -25,4 +23,4 @@ import { SessionRepository } from '@infrastructure/repositories/session.reposito
   ],
   exports: [MoviesService],
 })
-export class MoviesModule { }
+export class MoviesModule {}

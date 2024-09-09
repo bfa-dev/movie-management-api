@@ -47,6 +47,7 @@ describe('AuthService', () => {
   describe('validateUser', () => {
     it('should return user data without password if credentials are valid', async () => {
       const mockUser = { id: '1', email: 'test@example.com', password: 'hashedPassword' };
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const compareSpy = jest.spyOn(require('bcrypt'), 'compare').mockResolvedValue(true);
 
       (usersService.findUserByEmailWithPassword as jest.Mock).mockResolvedValue(mockUser);
@@ -58,6 +59,7 @@ describe('AuthService', () => {
     });
 
     it('should return null if credentials are invalid', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const compareSpy = jest.spyOn(require('bcrypt'), 'compare').mockResolvedValue(false);
 
       (usersService.findUserByEmailWithPassword as jest.Mock).mockResolvedValue({ password: 'hashedPassword' });
@@ -98,23 +100,25 @@ describe('AuthService', () => {
     it('should throw UserNotAuthorizedError if credentials are invalid', async () => {
       jest.spyOn(authService, 'validateUser').mockResolvedValue(null);
 
-      await expect(authService.login({ email: 'test@example.com', password: 'password' }))
-        .rejects
-        .toThrow(UserNotAuthorizedError);
+      await expect(authService.login({ email: 'test@example.com', password: 'password' })).rejects.toThrow(UserNotAuthorizedError);
     });
 
     it('should throw an error if an exception occurs during validation', async () => {
       jest.spyOn(authService, 'validateUser').mockRejectedValue(new Error('Unexpected error'));
 
-      await expect(authService.login({ email: 'test@example.com', password: 'password' }))
-        .rejects
-        .toThrow('Unexpected error');
+      await expect(authService.login({ email: 'test@example.com', password: 'password' })).rejects.toThrow('Unexpected error');
     });
   });
 
   describe('register', () => {
     it('should return a JWT token if registration is successful', async () => {
-      const createUserDto: CreateUserDto = { email: 'test@example.com', password: 'password', username: 'TestUser', age: 25, role: Role.CUSTOMER };
+      const createUserDto: CreateUserDto = {
+        email: 'test@example.com',
+        password: 'password',
+        username: 'TestUser',
+        age: 25,
+        role: Role.CUSTOMER,
+      };
       const mockUser = {
         id: '4a736f64-616c-69-6173-696f6e',
         email: 'test@example.com',
@@ -135,25 +139,29 @@ describe('AuthService', () => {
     it('should throw UserAlreadyExistsError if the user already exists', async () => {
       (usersService.findUserByEmail as jest.Mock).mockResolvedValue({ id: '1', email: 'test@example.com' });
 
-      await expect(authService.register({
-        email: 'test@example.com',
-        password: 'password',
-        username: 'TestUser',
-        age: 25,
-        role: Role.CUSTOMER,
-      })).rejects.toThrow(UserAlreadyExistsError);
+      await expect(
+        authService.register({
+          email: 'test@example.com',
+          password: 'password',
+          username: 'TestUser',
+          age: 25,
+          role: Role.CUSTOMER,
+        }),
+      ).rejects.toThrow(UserAlreadyExistsError);
     });
 
     it('should throw an error if an exception occurs during registration', async () => {
       (usersService.findUserByEmail as jest.Mock).mockRejectedValue(new Error('Unexpected error'));
 
-      await expect(authService.register({
-        email: 'test@example.com',
-        password: 'password',
-        username: 'TestUser',
-        age: 25,
-        role: Role.CUSTOMER,
-      })).rejects.toThrow('Unexpected error');
+      await expect(
+        authService.register({
+          email: 'test@example.com',
+          password: 'password',
+          username: 'TestUser',
+          age: 25,
+          role: Role.CUSTOMER,
+        }),
+      ).rejects.toThrow('Unexpected error');
     });
   });
 
@@ -185,25 +193,29 @@ describe('AuthService', () => {
     it('should throw UserAlreadyExistsError if the manager already exists', async () => {
       (usersService.findUserByEmail as jest.Mock).mockResolvedValue({ id: '1', email: 'manager@example.com' });
 
-      await expect(authService.createManager({
-        email: 'manager@example.com',
-        password: 'password',
-        username: 'ManagerUser',
-        age: 30,
-        role: Role.MANAGER,
-      })).rejects.toThrow(UserAlreadyExistsError);
+      await expect(
+        authService.createManager({
+          email: 'manager@example.com',
+          password: 'password',
+          username: 'ManagerUser',
+          age: 30,
+          role: Role.MANAGER,
+        }),
+      ).rejects.toThrow(UserAlreadyExistsError);
     });
 
     it('should throw an error if an exception occurs during manager creation', async () => {
       (usersService.findUserByEmail as jest.Mock).mockRejectedValue(new Error('Unexpected error'));
 
-      await expect(authService.createManager({
-        email: 'manager@example.com',
-        password: 'password',
-        username: 'ManagerUser',
-        age: 30,
-        role: Role.MANAGER,
-      })).rejects.toThrow('Unexpected error');
+      await expect(
+        authService.createManager({
+          email: 'manager@example.com',
+          password: 'password',
+          username: 'ManagerUser',
+          age: 30,
+          role: Role.MANAGER,
+        }),
+      ).rejects.toThrow('Unexpected error');
     });
   });
 

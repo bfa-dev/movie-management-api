@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
@@ -9,9 +10,8 @@ import { Ticket } from '../../src/domain/tickets/entities/ticket.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { movieData5, movieData6 } from './mocks/movie-mocks';
-import { sessionData5, sessionData6, sessionData7, sessionData8, sessionData9, sessionData10 } from './mocks/sessions-mocks';
+import { sessionData5, sessionData6, sessionData7, sessionData8, sessionData9 } from './mocks/sessions-mocks';
 import { User } from '../../src/domain/users/entities/user.entity';
-import { ERRORS } from '../../src/domain/exceptions/messages';
 import { authenticateUser } from './helpers/authenticate-user';
 import { createMovies, createSessions } from './helpers/data-helpers';
 
@@ -72,7 +72,6 @@ describe('SessionsController (e2e)', () => {
       .post(`/sessions/${firstMovieId}`)
       .send(sessionData7)
       .set('Authorization', `Bearer ${managerToken}`);
-    console.log(JSON.stringify(response.body, null, 2), "SESSIONS");
     expect(response.status).toBe(HttpStatus.CREATED);
     expect(response.body.data).toBeInstanceOf(Object);
     expect(response.body.data.date).toBe(sessionData7.date);
@@ -82,9 +81,7 @@ describe('SessionsController (e2e)', () => {
   });
 
   it('/sessions/:movieId (POST) - should fail create session for movie without manager authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .post(`/sessions/${firstMovieId}`)
-      .send(sessionData8);
+    const response = await request(app.getHttpServer()).post(`/sessions/${firstMovieId}`).send(sessionData8);
     expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     expect(response.body.message).toBe('Unauthorized');
   });
@@ -108,25 +105,18 @@ describe('SessionsController (e2e)', () => {
   });
 
   it('/:sessionId (DELETE) - should fail delete session with user authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .delete(`/sessions/${secondSessionId}`)
-      .set('Authorization', `Bearer ${userToken}`);
+    const response = await request(app.getHttpServer()).delete(`/sessions/${secondSessionId}`).set('Authorization', `Bearer ${userToken}`);
     expect(response.status).toBe(HttpStatus.FORBIDDEN);
     expect(response.body.message).toBe('Forbidden resource');
   });
 
   it('/:sessionId (DELETE) - should fail delete session without authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .delete(`/sessions/${firstSessionId}`)
+    const response = await request(app.getHttpServer()).delete(`/sessions/${firstSessionId}`);
     expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     expect(response.body.message).toBe('Unauthorized');
   });
-
 
   afterAll(async () => {
     await app.close();
   });
 });
-
-
-

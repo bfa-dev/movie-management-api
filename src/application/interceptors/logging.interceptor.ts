@@ -7,7 +7,6 @@ class LoggingInterceptor implements NestInterceptor {
   private readonly ctxPrefix: string = LoggingInterceptor.name;
   private readonly logger: Logger = new Logger(this.ctxPrefix);
   public intercept(context: ExecutionContext, call$: CallHandler): Observable<unknown> {
-
     const req = context.switchToHttp().getRequest();
     const { method, url, body, headers } = req;
 

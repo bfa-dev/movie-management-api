@@ -10,7 +10,7 @@ export class UserRepository implements IUserRepository {
   constructor(
     @InjectRepository(User)
     private readonly repository: Repository<User>,
-  ) { }
+  ) {}
 
   async save(user: User): Promise<User> {
     return this.repository.save(user);
@@ -23,7 +23,7 @@ export class UserRepository implements IUserRepository {
   async findById(id: string): Promise<User | null> {
     return this.repository.findOne({
       where: { id },
-      relations: ['tickets']
+      relations: ['tickets'],
     });
   }
 
@@ -34,7 +34,7 @@ export class UserRepository implements IUserRepository {
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return this.repository.findOne({
       where: { email },
-      select: ['id', 'username', 'email', 'password', 'role', 'age']
+      select: ['id', 'username', 'email', 'password', 'role', 'age'],
     });
   }
 

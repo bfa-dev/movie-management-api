@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOneOptions, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { Movie } from '@domain/movies/entities/movie.entity';
 import { IMovieRepository } from '@domain/movies/repositories/movie-repository.interface';
 import { MovieNotFoundError } from '@domain/exceptions';
@@ -10,7 +10,7 @@ export class MovieRepository implements IMovieRepository {
   constructor(
     @InjectRepository(Movie)
     private readonly repository: Repository<Movie>,
-  ) { }
+  ) {}
 
   async save(movie: DeepPartial<Movie>): Promise<Movie> {
     return this.repository.save(movie);
@@ -41,7 +41,40 @@ export class MovieRepository implements IMovieRepository {
     return this.repository.find(relations);
   }
 
-  async findActiveMovies(options?: FindManyOptions<Movie>): Promise<Movie[]> {
-    return this.repository.find({ where: { isActive: true }, ...options });
+  async findActiveMovies(
+    sortBy?: string,
+    sortOrder?: 'ASC' | 'DESC',
+    name?: string,
+    ageRestriction?: number,
+    ageRestrictionCondition?: 'greaterOrEqual' | 'lesser',
+  ): Promise<Movie[]> {
+    const filter: any = {};
+
+    if (name) {
+      filter.name = name;
+    }
+
+    if (ageRestriction) {
+      if (ageRestrictionCondition === 'greaterOrEqual') {
+        filter.ageRestriction = MoreThanOrEqual(ageRestriction);
+      } else if (ageRestrictionCondition === 'lesser') {
+        filter.ageRestriction = LessThan(ageRestriction);
+      } else {
+        filter.ageRestriction = ageRestriction;
+      }
+    }
+
+    const sortField = sortBy || 'name';
+    const sortDirection = sortOrder || 'ASC';
+    const order: any = {};
+    order[sortField] = sortDirection;
+
+    const options: FindManyOptions<Movie> = {
+      relations: ['sessions'],
+      order,
+      where: { isActive: true, ...filter },
+    };
+
+    return this.repository.find(options);
   }
 }

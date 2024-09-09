@@ -28,9 +28,9 @@ export class Session {
   @Column()
   roomNumber: number;
 
-  @ManyToOne(() => Movie, movie => movie.sessions)
+  @ManyToOne(() => Movie, (movie) => movie.sessions)
   movie: Movie;
 
-  @OneToMany(() => Ticket, ticket => ticket.sessionId)
+  @OneToMany(() => Ticket, (ticket) => ticket.sessionId)
   tickets: Ticket[];
 }

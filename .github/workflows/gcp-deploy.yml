@@ -40,4 +40,4 @@ jobs:
           --platform managed \
           --region $REGION \
           --allow-unauthenticated \
-          --set-env-vars="DATABASE_URL=${{ secrets.DATABASE_URL }},REDIS_URL=${{ secrets.REDIS_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }}"
+          --set-env-vars="DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }}"

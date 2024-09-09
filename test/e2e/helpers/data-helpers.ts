@@ -5,15 +5,12 @@ import { Repository } from 'typeorm';
 
 export async function createMovies(
   movieRepository: Repository<Movie>,
-  moviesData: { name: string; ageRestriction: number }[]
+  moviesData: { name: string; ageRestriction: number }[],
 ): Promise<Movie[]> {
   const movies: Movie[] = [];
 
   for (let i = 0; i < moviesData.length; i++) {
-    const movie = new Movie(
-      moviesData[i].name,
-      moviesData[i].ageRestriction
-    );
+    const movie = new Movie(moviesData[i].name, moviesData[i].ageRestriction);
     await movieRepository.save(movie);
     movies.push(movie);
   }
@@ -23,7 +20,7 @@ export async function createMovies(
 export async function createSessions(
   sessionRepository: Repository<Session>,
   sessionsData: { date: string; timeSlot: string; roomNumber: number }[],
-  movies: Movie[]
+  movies: Movie[],
 ): Promise<Session[]> {
   const sessions: Session[] = [];
 
@@ -32,7 +29,7 @@ export async function createSessions(
       new Date(sessionsData[i].date),
       sessionsData[i].timeSlot as TimeSlot,
       sessionsData[i].roomNumber,
-      movies[i]
+      movies[i],
     );
     await sessionRepository.save(session);
     sessions.push(session);

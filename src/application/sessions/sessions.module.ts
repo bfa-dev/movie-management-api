@@ -9,10 +9,13 @@ import { MoviesModule } from '@application/movies/movies.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Session]), MoviesModule],
   controllers: [SessionsController],
-  providers: [SessionsService, {
-    provide: 'ISessionRepository',
-    useClass: SessionRepository
-  }],
+  providers: [
+    SessionsService,
+    {
+      provide: 'ISessionRepository',
+      useClass: SessionRepository,
+    },
+  ],
   exports: [SessionsService],
 })
-export class SessionsModule { }
+export class SessionsModule {}

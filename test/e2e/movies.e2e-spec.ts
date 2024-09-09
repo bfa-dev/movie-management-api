@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
@@ -8,14 +9,7 @@ import { Session } from '../../src/domain/sessions/entities/session.entity';
 import { Ticket } from '../../src/domain/tickets/entities/ticket.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import {
-  movieData1,
-  movieData2,
-  movieData7,
-  movieData8,
-  movieData9,
-  movieData10
-} from './mocks/movie-mocks';
+import { movieData1, movieData2, movieData7, movieData8, movieData9, movieData10 } from './mocks/movie-mocks';
 import { User } from '../../src/domain/users/entities/user.entity';
 import { ERRORS } from '../../src/domain/exceptions/messages';
 
@@ -53,32 +47,25 @@ describe('MoviesController (e2e)', () => {
     userRepository = moduleFixture.get<Repository<User>>('UserRepository');
     configService = moduleFixture.get<ConfigService>(ConfigService);
 
-    let managerEmail = configService.get('INITIAL_MANAGER_EMAIL');
-    let managerPassword = configService.get('INITIAL_MANAGER_PASSWORD');
-    let managerLoginResponse = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        email: managerEmail,
-        password: managerPassword,
-      });
+    const managerEmail = configService.get('INITIAL_MANAGER_EMAIL');
+    const managerPassword = configService.get('INITIAL_MANAGER_PASSWORD');
+    const managerLoginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+      email: managerEmail,
+      password: managerPassword,
+    });
     managerToken = managerLoginResponse.body.data.access_token;
 
-    let userEmail = configService.get('INITIAL_USER_EMAIL');
-    let userPassword = configService.get('INITIAL_USER_PASSWORD');
-    let userLoginResponse = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        email: userEmail,
-        password: userPassword,
-      });
+    const userEmail = configService.get('INITIAL_USER_EMAIL');
+    const userPassword = configService.get('INITIAL_USER_PASSWORD');
+    const userLoginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+      email: userEmail,
+      password: userPassword,
+    });
     userToken = userLoginResponse.body.data.access_token;
   });
 
   it('/movies (POST) - should create movie with sessions with manager authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/movies')
-      .send(movieData1)
-      .set('Authorization', `Bearer ${managerToken}`);
+    const response = await request(app.getHttpServer()).post('/movies').send(movieData1).set('Authorization', `Bearer ${managerToken}`);
     movieId = response.body.data.id;
     sessionId = response.body.data.sessions[0].id;
     Object.assign(movieData2.sessions[0], { id: sessionId });
@@ -94,18 +81,13 @@ describe('MoviesController (e2e)', () => {
   });
 
   it('/movies (POST) - should fail create movie without manager authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/movies')
-      .send(movieData1);
+    const response = await request(app.getHttpServer()).post('/movies').send(movieData1);
     expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     expect(response.body.message).toBe('Unauthorized');
   });
 
   it('/movies (POST) - should fail create movie with user authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/movies')
-      .send(movieData1)
-      .set('Authorization', `Bearer ${userToken}`);
+    const response = await request(app.getHttpServer()).post('/movies').send(movieData1).set('Authorization', `Bearer ${userToken}`);
     expect(response.status).toBe(HttpStatus.FORBIDDEN);
     expect(response.body.message).toBe('Forbidden resource');
   });
@@ -146,9 +128,7 @@ describe('MoviesController (e2e)', () => {
   });
 
   it('/movies/:id (PUT) - should fail update movie without manager authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .put(`/movies/${movieId}`)
-      .send(movieData2);
+    const response = await request(app.getHttpServer()).put(`/movies/${movieId}`).send(movieData2);
     expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     expect(response.body.message).toBe('Unauthorized');
   });
@@ -191,25 +171,20 @@ describe('MoviesController (e2e)', () => {
   });
 
   it('/movies/:id (DELETE) - should delete movie with manager authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .delete(`/movies/${movieId}`)
-      .set('Authorization', `Bearer ${managerToken}`);
+    const response = await request(app.getHttpServer()).delete(`/movies/${movieId}`).set('Authorization', `Bearer ${managerToken}`);
     expect(response.status).toBe(HttpStatus.OK);
     expect(response.body.data).toBeInstanceOf(Object);
     expect(response.body.data.id).toBe(movieId);
   });
 
   it('/movies/:id (DELETE) - should fail delete movie without manager authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .delete(`/movies/${movieId}`);
+    const response = await request(app.getHttpServer()).delete(`/movies/${movieId}`);
     expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     expect(response.body.message).toBe('Unauthorized');
   });
 
   it('/movies/:id (DELETE) - should fail delete movie with user authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .delete(`/movies/${movieId}`)
-      .set('Authorization', `Bearer ${userToken}`);
+    const response = await request(app.getHttpServer()).delete(`/movies/${movieId}`).set('Authorization', `Bearer ${userToken}`);
     expect(response.status).toBe(HttpStatus.FORBIDDEN);
     expect(response.body.message).toBe('Forbidden resource');
   });

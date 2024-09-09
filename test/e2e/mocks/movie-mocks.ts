@@ -4,7 +4,7 @@ export const movieData1 = {
   sessions: [
     {
       date: '2024-10-07T00:00:00.000Z',
-      timeSlot: "12:00-14:00",
+      timeSlot: '12:00-14:00',
       roomNumber: 2,
     },
   ],
@@ -16,7 +16,7 @@ export const movieData2 = {
   sessions: [
     {
       date: '2024-10-08T00:00:00.000Z',
-      timeSlot: "14:00-16:00",
+      timeSlot: '14:00-16:00',
       roomNumber: 4,
     },
   ],
@@ -28,7 +28,7 @@ export const movieData3 = {
   sessions: [
     {
       date: '2024-09-09T00:00:00.000Z',
-      timeSlot: "10:00-12:00",
+      timeSlot: '10:00-12:00',
       roomNumber: 1,
     },
   ],
@@ -40,7 +40,7 @@ export const movieData4 = {
   sessions: [
     {
       date: '2024-09-10T00:00:00.000Z',
-      timeSlot: "16:00-18:00",
+      timeSlot: '16:00-18:00',
       roomNumber: 3,
     },
   ],
@@ -52,7 +52,7 @@ export const movieData5 = {
   sessions: [
     {
       date: '2024-09-11T00:00:00.000Z',
-      timeSlot: "18:00-20:00",
+      timeSlot: '18:00-20:00',
       roomNumber: 5,
     },
   ],
@@ -64,7 +64,7 @@ export const movieData6 = {
   sessions: [
     {
       date: '2024-09-12T00:00:00.000Z',
-      timeSlot: "20:00-22:00",
+      timeSlot: '20:00-22:00',
       roomNumber: 6,
     },
   ],
@@ -76,7 +76,7 @@ export const movieData7 = {
   sessions: [
     {
       date: '2024-09-13T00:00:00.000Z',
-      timeSlot: "22:00-00:00",
+      timeSlot: '22:00-00:00',
       roomNumber: 7,
     },
   ],
@@ -88,12 +88,11 @@ export const movieData8 = {
   sessions: [
     {
       date: '2024-09-14T00:00:00.000Z',
-      timeSlot: "23:59-02:00",
+      timeSlot: '23:59-02:00',
       roomNumber: 8,
     },
   ],
 };
-
 
 export const movieData9 = {
   name: 'Test Movie 9',
@@ -101,7 +100,7 @@ export const movieData9 = {
   sessions: [
     {
       date: '2024-09-13T00:00:00.000Z',
-      timeSlot: "22:00-00:00",
+      timeSlot: '22:00-00:00',
       roomNumber: 7,
     },
   ],
@@ -113,7 +112,19 @@ export const movieData10 = {
   sessions: [
     {
       date: '2024-09-14T00:00:00.000Z',
-      timeSlot: "23:59-02:00",
+      timeSlot: '23:59-02:00',
+      roomNumber: 8,
+    },
+  ],
+};
+
+export const movieData11 = {
+  name: 'Test Movie 11',
+  ageRestriction: 11,
+  sessions: [
+    {
+      date: '2024-09-09T00:00:00.000Z',
+      timeSlot: '14:00-16:00',
       roomNumber: 8,
     },
   ],

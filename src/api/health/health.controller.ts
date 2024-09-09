@@ -7,7 +7,7 @@ import { GenericResponseDto } from '@api/shared/dto/generic-response.dto';
 @ApiTags('Health')
 @Controller('health')
 export class HealthController {
-  constructor(private readonly healthService: HealthService) { }
+  constructor(private readonly healthService: HealthService) {}
 
   @Public()
   @Get()

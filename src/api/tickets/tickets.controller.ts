@@ -1,17 +1,17 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
-import { TicketsService } from '../../application/tickets/tickets.service'
+import { Controller, Param, Post } from '@nestjs/common';
+import { TicketsService } from '../../application/tickets/tickets.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Role } from '@domain/auth/enums/role.enum';
 import { Roles } from '@application/decorators/roles.decorator';
 import { GenericResponseDto } from '@api/shared/dto/generic-response.dto';
 import { CurrentUser } from '@application/decorators/current-user.decorator';
 import { User } from '@domain/users/entities/user.entity';
-import { WatchMovieDto } from '@api/movies/dto/watch-movie.dto';
+import { WatchMovieDto } from '@api/tickets/dto/watch-movie.dto';
 
 @ApiTags('tickets')
 @Controller('tickets')
 export class TicketsController {
-  constructor(private readonly ticketsService: TicketsService) { }
+  constructor(private readonly ticketsService: TicketsService) {}
 
   @Post(':sessionId/checkout')
   @ApiBearerAuth()

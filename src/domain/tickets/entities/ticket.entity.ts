@@ -1,7 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, JoinColumn } from 'typeorm';
-import { User } from '@domain/users/entities/user.entity';
-import { Session } from '@domain/sessions/entities/session.entity';
-import { Movie } from '@domain/movies/entities/movie.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Ticket {

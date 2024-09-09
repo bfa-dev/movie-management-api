@@ -1,11 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@domain/auth/enums/role.enum';
-import { IsString, IsInt, IsEnum, IsEmail } from 'class-validator';
+import { IsString, IsInt, IsEnum, IsEmail, IsOptional } from 'class-validator';
 import { PrimaryGeneratedColumn } from 'typeorm';
 
 export class BaseUser {
   @PrimaryGeneratedColumn('uuid')
   @IsString()
+  @IsOptional()
   id?: string;
 
   @ApiProperty({ example: 'Furkan Akgul' })

@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes } from '@nestjs/common';
 import { AuthService } from '@application/auth/auth.service';
 import { Public } from '@application/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
@@ -12,10 +12,11 @@ import { GenericResponseDto } from '@api/shared/dto/generic-response.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @Public()
   @Post('login')
+  @UsePipes()
   @ApiOperation({ summary: 'User login' })
   @ApiResponse({ status: 200, description: 'Return JWT access token' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

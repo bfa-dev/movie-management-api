@@ -10,7 +10,7 @@ export class AppInitializerService {
     private readonly logger: PinoLogger,
     private readonly userService: UsersService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async onModuleInit() {
     this.logger.info('Initializing app...');

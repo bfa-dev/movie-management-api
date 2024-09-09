@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
@@ -8,8 +9,8 @@ import { Session } from '../../src/domain/sessions/entities/session.entity';
 import { Ticket } from '../../src/domain/tickets/entities/ticket.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { movieData3, movieData4 } from './mocks/movie-mocks';
-import { sessionData3, sessionData4 } from './mocks/sessions-mocks';
+import { movieData3, movieData4, movieData11 } from './mocks/movie-mocks';
+import { sessionData3, sessionData4, sessionData11 } from './mocks/sessions-mocks';
 import { User } from '../../src/domain/users/entities/user.entity';
 import { ERRORS } from '../../src/domain/exceptions/messages';
 import { authenticateUser } from './helpers/authenticate-user';
@@ -28,10 +29,9 @@ describe('TicketsController (e2e)', () => {
   let secondMovieId: string;
   let firstSessionId: string;
   let secondSessionId: string;
+  let thirdSessionId: string;
   let managerFirstTicketId: string;
-  let managerSecondTicketId: string;
   let userFirstTicketId: string;
-  let userSecondTicketId: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -58,13 +58,14 @@ describe('TicketsController (e2e)', () => {
     managerToken = (await authenticateUser(app, 'INITIAL_MANAGER_EMAIL', 'INITIAL_MANAGER_PASSWORD')).access_token;
     userToken = (await authenticateUser(app, 'INITIAL_USER_EMAIL', 'INITIAL_USER_PASSWORD')).access_token;
 
-    const movies = await createMovies(movieRepository, [movieData3, movieData4]);
+    const movies = await createMovies(movieRepository, [movieData3, movieData4, movieData11]);
     firstMovieId = movies[0].id;
     secondMovieId = movies[1].id;
 
-    const sessions = await createSessions(sessionRepository, [sessionData3, sessionData4], movies);
+    const sessions = await createSessions(sessionRepository, [sessionData3, sessionData4, sessionData11], movies);
     firstSessionId = sessions[0].id;
     secondSessionId = sessions[1].id;
+    thirdSessionId = sessions[2].id;
   });
 
   it('/tickets/:sessionId/checkout (POST) - user should not buy ticket because he/she is not old enough', async () => {
@@ -87,6 +88,15 @@ describe('TicketsController (e2e)', () => {
     userFirstTicketId = response.body.data.id;
   });
 
+  it('/tickets/:sessionId/checkout (POST) - user should not buy ticket because session is already passed', async () => {
+    const response = await request(app.getHttpServer())
+      .post(`/tickets/${thirdSessionId}/checkout`)
+      .set('Authorization', `Bearer ${userToken}`);
+    expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    expect(response.body.name).toBe(ERRORS.SESSION_ALREADY_PASSED.error);
+    expect(response.body.message).toBe(ERRORS.SESSION_ALREADY_PASSED.message);
+  });
+
   it('/tickets/:sessionId/checkout (POST) - manager should buy ticket', async () => {
     const response = await request(app.getHttpServer())
       .post(`/tickets/${firstSessionId}/checkout`)
@@ -99,8 +109,7 @@ describe('TicketsController (e2e)', () => {
   });
 
   it('/tickets/:sessionId/checkout (POST) - should fail buy ticket without user authorization', async () => {
-    const response = await request(app.getHttpServer())
-      .post(`/tickets/${firstSessionId}/checkout`);
+    const response = await request(app.getHttpServer()).post(`/tickets/${firstSessionId}/checkout`);
     expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     expect(response.body.message).toBe('Unauthorized');
   });

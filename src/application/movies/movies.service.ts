@@ -9,13 +9,10 @@ import { ISessionRepository } from '@domain/sessions/repositories/session-reposi
 import { CreateSessionDto } from '@api/sessions/dto/create-session.dto';
 import { UpdateMovieDto } from '@api/movies/dto/update-movie.dto';
 import { UpdateSessionDto } from '@api/sessions/dto/update-session-dto';
-import {
-  MovieNotFoundError,
-  SessionAlreadyExistsError,
-  SessionNotFoundError,
-  ThereAreNoMoviesError
-} from '@domain/exceptions';
+import { MovieNotFoundError, SessionAlreadyExistsError, SessionNotFoundError } from '@domain/exceptions';
 import { BulkCreateMovieDto } from '@api/movies/dto/bulk/bulk-movie.dto';
+import { ListMoviesDto } from '@api/movies/dto/list-movies.dto';
+import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class MoviesService {
@@ -25,22 +22,22 @@ export class MoviesService {
     @Inject('ISessionRepository')
     private sessionRepository: ISessionRepository,
     private dataSource: DataSource,
-  ) { }
+    private logger: PinoLogger,
+  ) {}
 
   async findMoviesByIds(movieIds: string[]): Promise<Movie[]> {
-    return this.movieRepository.findWithRelations({ where: { id: In(movieIds) } });
+    return this.movieRepository.findWithRelations({ where: { id: In(movieIds) }, relations: ['sessions'] });
   }
 
-  private async checkIfRoomIsAvailable(sessionParams: { date: Date, timeSlot: TimeSlot, roomNumber: number }): Promise<void> {
+  private async checkIfRoomIsAvailable(sessionParams: { date: Date; timeSlot: TimeSlot; roomNumber: number }): Promise<void> {
     const { date, timeSlot, roomNumber } = sessionParams;
-    const existingSession = await this.sessionRepository.findOneByOptions(
-      {
-        where: {
-          date: date,
-          timeSlot: timeSlot,
-          roomNumber: roomNumber
-        }
-      });
+    const existingSession = await this.sessionRepository.findOneByOptions({
+      where: {
+        date: date,
+        timeSlot: timeSlot,
+        roomNumber: roomNumber,
+      },
+    });
 
     if (existingSession) {
       throw new SessionAlreadyExistsError();
@@ -55,7 +52,11 @@ export class MoviesService {
     return this.sessionRepository.save(session);
   }
 
-  async addSessionToMovieTransactional(transactionalEntityManager: EntityManager, movie: Movie, createSessionDto: CreateSessionDto): Promise<Session> {
+  async addSessionToMovieTransactional(
+    transactionalEntityManager: EntityManager,
+    movie: Movie,
+    createSessionDto: CreateSessionDto,
+  ): Promise<Session> {
     const { date, timeSlot, roomNumber } = createSessionDto;
 
     const session = new Session(new Date(date), timeSlot, roomNumber, movie);
@@ -66,22 +67,33 @@ export class MoviesService {
   }
 
   async createMovie(createMovieDto: CreateMovieDto): Promise<Movie> {
-    const { name, ageRestriction, sessions } = createMovieDto;
+    return this.dataSource.transaction(async (transactionalEntityManager: EntityManager) => {
+      const { name, ageRestriction, sessions } = createMovieDto;
 
-    const movie = new Movie(name, ageRestriction);
-    const savedMovie = await this.movieRepository.save(movie);
+      const movie = new Movie(name, ageRestriction);
+      const savedMovie = await transactionalEntityManager.save(Movie, movie);
 
-    if (sessions && sessions.length > 0) {
-      for (const sessionDto of sessions) {
-        const session = await this.addSessionToMovie(savedMovie, sessionDto);
+      if (sessions && sessions.length > 0) {
+        for (const sessionDto of sessions) {
+          await this.addSessionToMovieTransactional(transactionalEntityManager, savedMovie, sessionDto);
+        }
       }
-    }
 
-    return this.movieRepository.findOneWithRelations({ where: { id: savedMovie.id }, relations: ['sessions'] });
+      const movieWithRelations = await transactionalEntityManager.findOne(Movie, {
+        where: { id: savedMovie.id },
+        relations: ['sessions'],
+      });
+
+      return movieWithRelations;
+    });
   }
 
   private isSessionUpdated(session: Session, sessionDto: UpdateSessionDto): boolean {
-    return new Date(sessionDto.date).getTime() !== session.date.getTime() || sessionDto.timeSlot !== session.timeSlot || sessionDto.roomNumber !== session.roomNumber;
+    return (
+      new Date(sessionDto.date).getTime() !== session.date.getTime() ||
+      sessionDto.timeSlot !== session.timeSlot ||
+      sessionDto.roomNumber !== session.roomNumber
+    );
   }
 
   private isMovieUpdated(movie: Movie, movieDto: UpdateMovieDto): boolean {
@@ -101,7 +113,7 @@ export class MoviesService {
       const sessionParams = {
         date: new Date(sessionDto.date),
         timeSlot: sessionDto.timeSlot,
-        roomNumber: sessionDto.roomNumber
+        roomNumber: sessionDto.roomNumber,
       };
 
       if (isSessionUpdated) {
@@ -129,7 +141,7 @@ export class MoviesService {
     if (isMovieUpdated) {
       Object.assign(movie, {
         name,
-        ageRestriction
+        ageRestriction,
       });
       await this.movieRepository.save(movie);
     }
@@ -139,21 +151,6 @@ export class MoviesService {
 
   async deleteMovie(id: string): Promise<Movie> {
     return this.movieRepository.updateOne(id, { isActive: false });
-  }
-
-  async addSession(movieId: string, date: Date, timeSlot: TimeSlot, roomNumber: number): Promise<Session> {
-    const movie = await this.movieRepository.findOneById(movieId);
-    if (!movie) {
-      throw new MovieNotFoundError();
-    }
-
-    const session = new Session(date, timeSlot, roomNumber, movie);
-    return this.sessionRepository.save(session).catch((error) => {
-      if (error.code === '23505') {
-        throw new SessionAlreadyExistsError();
-      }
-      throw error;
-    });
   }
 
   async getMovieWithSessions(id: string): Promise<Movie> {
@@ -172,17 +169,14 @@ export class MoviesService {
     return movie;
   }
 
-  async listActiveMovies(sortBy: string, sortOrder: 'ASC' | 'DESC', filter: any): Promise<Movie[]> {
-    const movies = await this.movieRepository.findWithRelations({
-      relations: ['sessions'],
-      order: { [sortBy]: sortOrder },
-      where: { isActive: true, ...filter }
-    });
-
-    if (movies.length === 0) {
-      throw new ThereAreNoMoviesError();
-    }
-    return movies;
+  async listActiveMovies(listMoviesDto: ListMoviesDto): Promise<Movie[]> {
+    return this.movieRepository.findActiveMovies(
+      listMoviesDto.sortBy,
+      listMoviesDto.sortOrder,
+      listMoviesDto.name,
+      listMoviesDto.ageRestriction,
+      listMoviesDto.ageRestrictionCondition,
+    );
   }
 
   async bulkAddMovies(bulkCreateMovieDto: BulkCreateMovieDto): Promise<Movie[]> {
@@ -190,7 +184,6 @@ export class MoviesService {
       const movies: Movie[] = [];
 
       for (const createMovieDto of bulkCreateMovieDto.movies) {
-
         const { name, ageRestriction, sessions } = createMovieDto;
 
         const savedMovie = await transactionalEntityManager.save(Movie, { name, ageRestriction });
@@ -201,14 +194,39 @@ export class MoviesService {
           }
         }
 
-        movies.push(savedMovie);
+        const movieWithRelations = await transactionalEntityManager.findOne(Movie, {
+          where: { id: savedMovie.id },
+          relations: ['sessions'],
+        });
+
+        if (movieWithRelations) {
+          movies.push(movieWithRelations);
+        }
       }
 
       return movies;
     });
   }
 
-  async bulkDeleteMovies(movieIds: string[]): Promise<void> {
-    await Promise.all(movieIds.map(id => this.movieRepository.updateOne(id, { isActive: false })));
+  async bulkDeleteMovies(movieIds: string[]): Promise<Movie[]> {
+    const deletedMovies: Movie[] = [];
+
+    await Promise.all(
+      movieIds.map(async (id) => {
+        const movie = await this.movieRepository.findOneWithRelations({ where: { id }, relations: ['sessions'] });
+
+        if (movie) {
+          await this.movieRepository.updateOne(id, { isActive: false });
+          if (movie.sessions && movie.sessions.length > 0) {
+            for (const session of movie.sessions) {
+              await this.sessionRepository.delete(session.id);
+            }
+          }
+          deletedMovies.push(movie);
+        }
+      }),
+    );
+
+    return deletedMovies;
   }
 }

@@ -92,4 +92,16 @@ export class TicketDoesNotBelongToUserError extends BaseError {
   }
 }
 
+export class SessionAlreadyPassedError extends BaseError {
+  constructor() {
+    super(ERRORS.SESSION_ALREADY_PASSED, HttpStatus.BAD_REQUEST);
+  }
+}
+
+export class MovieHasNoSessionsToDelete extends BaseError {
+  constructor() {
+    super(ERRORS.MOVIE_HAS_NO_SESSIONS_TO_DELETE, HttpStatus.NOT_FOUND);
+  }
+}
+
 export default ERRORS;

@@ -8,5 +8,11 @@ export interface IMovieRepository {
   updateOne(id: string, partialMovie: DeepPartial<Movie>): Promise<Movie>;
   findOneWithRelations(relations: FindOneOptions<Movie>): Promise<Movie | null>;
   findWithRelations(relations: FindManyOptions<Movie>): Promise<Movie[]>;
-  findActiveMovies(options?: FindManyOptions<Movie>): Promise<Movie[]>;
+  findActiveMovies(
+    sortBy?: string,
+    sortOrder?: 'ASC' | 'DESC',
+    name?: string,
+    ageRestriction?: number,
+    ageRestrictionCondition?: 'greaterOrEqual' | 'lesser',
+  ): Promise<Movie[]>;
 }

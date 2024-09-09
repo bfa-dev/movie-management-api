@@ -8,11 +8,7 @@ import { TicketsModule } from '@application/tickets/tickets.module';
 import { MoviesModule } from '@application/movies/movies.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    TicketsModule,
-    MoviesModule,
-  ],
+  imports: [TypeOrmModule.forFeature([User]), TicketsModule, MoviesModule],
   providers: [
     {
       provide: 'IUserRepository',
@@ -23,4 +19,4 @@ import { MoviesModule } from '@application/movies/movies.module';
   controllers: [UsersController],
   exports: [UsersService],
 })
-export class UsersModule { }
+export class UsersModule {}

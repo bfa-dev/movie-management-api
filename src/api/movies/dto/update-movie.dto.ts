@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { UpdateSessionDto } from '../../sessions/dto/update-session-dto'
+import { UpdateSessionDto } from '../../sessions/dto/update-session-dto';
 
 export class UpdateMovieDto {
   @ApiProperty({ example: 'Truva' })

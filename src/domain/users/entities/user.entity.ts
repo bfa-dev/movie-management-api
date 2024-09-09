@@ -22,14 +22,14 @@ export class User {
   @Column({
     type: 'enum',
     enum: Role,
-    default: Role.CUSTOMER
+    default: Role.CUSTOMER,
   })
   role: Role;
 
   @Column({ unique: true })
   email: string;
 
-  @OneToMany(() => Ticket, ticket => ticket.userId)
+  @OneToMany(() => Ticket, (ticket) => ticket.userId)
   tickets: Ticket[];
 
   @ManyToMany(() => Movie)

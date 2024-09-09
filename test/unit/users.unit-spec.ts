@@ -50,7 +50,7 @@ describe('UsersController', () => {
     expect(result).toEqual(new GenericResponseDto(user, 'The user profile has been successfully retrieved.'));
   });
 
-  it('should return the user\'s watch history', async () => {
+  it("should return the user's watch history", async () => {
     const user: User = {
       id: '4a736f64-616c-69-6173-696f6e',
       email: 'user@example.com',
@@ -122,11 +122,13 @@ describe('UsersController', () => {
   });
 
   it('should return users by role as manager', async () => {
-    const mockUsers = [{
-      id: '4a736f64-616c-69-6173-696f6e',
-      email: 'user@example.com',
-      role: Role.MANAGER
-    } as User];
+    const mockUsers = [
+      {
+        id: '4a736f64-616c-69-6173-696f6e',
+        email: 'user@example.com',
+        role: Role.MANAGER,
+      } as User,
+    ];
 
     usersService.findByRole.mockResolvedValue(mockUsers);
 
@@ -136,11 +138,13 @@ describe('UsersController', () => {
   });
 
   it('should return users by role as customer', async () => {
-    const mockUsers = [{
-      id: '4a736f64-616c-69-6173-696f6e',
-      email: 'user@example.com',
-      role: Role.CUSTOMER
-    } as User];
+    const mockUsers = [
+      {
+        id: '4a736f64-616c-69-6173-696f6e',
+        email: 'user@example.com',
+        role: Role.CUSTOMER,
+      } as User,
+    ];
 
     usersService.findByRole.mockResolvedValue(mockUsers);
 
@@ -154,7 +158,7 @@ describe('UsersController', () => {
       id: '4a736f64-616c-69-6173-696f6e',
       email: 'user@example.com',
       password: 'password',
-      role: Role.MANAGER
+      role: Role.MANAGER,
     } as User;
 
     usersService.findUserByEmailWithPassword.mockResolvedValue(mockUser);
@@ -239,7 +243,7 @@ describe('UsersService', () => {
     const mockUser = {
       ...createUserDto,
       id: '4a736f64-616c-69-6173-696f6e',
-      password: hashedPassword
+      password: hashedPassword,
     } as User;
 
     jest.spyOn(bcrypt, 'hash').mockImplementation(() => Promise.resolve(hashedPassword));
@@ -249,13 +253,15 @@ describe('UsersService', () => {
 
     expect(result).toEqual(mockUser);
     expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
-    expect(usersRepository.save).toHaveBeenCalledWith(expect.objectContaining({
-      username: 'testuser',
-      password: hashedPassword,
-      age: 25,
-      role: Role.CUSTOMER,
-      email: 'testuser@example.com',
-    }));
+    expect(usersRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        username: 'testuser',
+        password: hashedPassword,
+        age: 25,
+        role: Role.CUSTOMER,
+        email: 'testuser@example.com',
+      }),
+    );
   });
 
   it('should get user watch history', async () => {
@@ -266,12 +272,15 @@ describe('UsersService', () => {
         userId: '1',
         movieId: 'movie1',
         sessionId: 's1',
-        used: true
+        used: true,
       },
       {
         id: '4a736f64-616c-69-6173-696f6e',
         userId: '1',
-        movieId: 'movie2', sessionId: 's2', used: true }
+        movieId: 'movie2',
+        sessionId: 's2',
+        used: true,
+      },
     ];
     const mockMovies = [
       { id: 'movie1', name: 'Movie 1' },

@@ -17,7 +17,7 @@ export class UsersService {
     private usersRepository: IUserRepository,
     private ticketsService: TicketsService,
     private moviesService: MoviesService,
-  ) { }
+  ) {}
 
   async findOne(options: FindOneOptions<User>): Promise<User | undefined> {
     const user = await this.usersRepository.findOne(options);
@@ -48,7 +48,9 @@ export class UsersService {
 
   async getWatchHistory(userId: string): Promise<Movie[]> {
     const usedTickets = await this.ticketsService.getUsersUsedTickets(userId);
-    const movies = await this.moviesService.findMoviesByIds(usedTickets.map(ticket => ticket.movieId));
+    console.log({ usedTickets });
+    const movies = await this.moviesService.findMoviesByIds(usedTickets.map((ticket) => ticket.movieId));
+    console.log({movies})
     return movies;
   }
 

@@ -4,15 +4,17 @@ import { ITicketRepository } from '@domain/tickets/repositories/ticket-repositor
 import { DeepPartial, FindOneOptions } from 'typeorm';
 import { User } from '@domain/users/entities/user.entity';
 import { SessionsService } from '@application/sessions/sessions.service';
-import { WatchMovieDto } from '@api/movies/dto/watch-movie.dto';
+import { WatchMovieDto } from '@api/tickets/dto/watch-movie.dto';
 import {
   MovieIsNotActiveError,
   SessionNotFoundError,
   TicketAlreadyUsedError,
   TicketNotFoundError,
   UserNotOldEnoughError,
-  TicketDoesNotBelongToUserError
+  TicketDoesNotBelongToUserError,
+  SessionAlreadyPassedError,
 } from '@domain/exceptions';
+import { TimeSlot } from '@domain/sessions/enums/time.slot.enum';
 
 @Injectable()
 export class TicketsService {
@@ -20,8 +22,7 @@ export class TicketsService {
     @Inject('ITicketRepository')
     private ticketRepository: ITicketRepository,
     private sessionsService: SessionsService,
-  ) { }
-
+  ) {}
 
   checkIfMovieIsActive(isActive: boolean) {
     if (isActive === false) {
@@ -69,6 +70,12 @@ export class TicketsService {
     this.checkIfMovieIsActive(session.movie.isActive);
     this.checkIfUserIsOldEnough(user.age, session.movie.ageRestriction);
 
+    const isPassed = this.checkIfSessionHasPassed(session.date, session.timeSlot);
+
+    if (isPassed) {
+      throw new SessionAlreadyPassedError();
+    }
+
     const ticket = await this.create({
       userId: user.id,
       sessionId,
@@ -85,6 +92,25 @@ export class TicketsService {
     }
   }
 
+  checkIfSessionHasPassed(sessionDate: Date, timeSlot: TimeSlot): boolean {
+    const now = new Date();
+    let isPassed = false;
+
+    if (sessionDate < now) {
+      isPassed = true;
+    }
+
+    const [startHour, startMinute] = timeSlot.split('-')[0].split(':').map(Number);
+    const sessionStartTime = new Date(sessionDate);
+    sessionStartTime.setHours(startHour, startMinute, 0, 0);
+
+    if (now > sessionStartTime) {
+      isPassed = true;
+    }
+
+    return isPassed;
+  }
+
   async watchMovie(user: User, watchMovieDto: WatchMovieDto): Promise<Ticket> {
     const ticket = await this.findOne({ where: { id: watchMovieDto.ticketId } });
     if (!ticket) {
@@ -96,6 +122,14 @@ export class TicketsService {
     }
 
     this.checkIfTicketBelongsToUser(user, ticket);
+
+    const session = await this.sessionsService.findOneById(ticket.sessionId);
+
+    const isPassed = this.checkIfSessionHasPassed(session.date, session.timeSlot);
+
+    if (isPassed) {
+      throw new SessionAlreadyPassedError();
+    }
 
     ticket.used = true;
 
