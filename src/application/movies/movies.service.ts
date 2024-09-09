@@ -29,6 +29,7 @@ export class MoviesService {
     return this.movieRepository.findWithRelations({ where: { id: In(movieIds) }, relations: ['sessions'] });
   }
 
+  // TODO: Move this logic to session.service
   private async checkIfRoomIsAvailable(sessionParams: { date: Date; timeSlot: TimeSlot; roomNumber: number }): Promise<void> {
     const { date, timeSlot, roomNumber } = sessionParams;
     const existingSession = await this.sessionRepository.findOneByOptions({
@@ -44,6 +45,7 @@ export class MoviesService {
     }
   }
 
+  // TODO: Move this to sessions service
   async addSessionToMovie(movie: Movie, createSessionDto: CreateSessionDto): Promise<Session> {
     const { date, timeSlot, roomNumber } = createSessionDto;
 
@@ -52,6 +54,7 @@ export class MoviesService {
     return this.sessionRepository.save(session);
   }
 
+  // TODO: Move this to sessions service
   async addSessionToMovieTransactional(
     transactionalEntityManager: EntityManager,
     movie: Movie,
@@ -88,6 +91,7 @@ export class MoviesService {
     });
   }
 
+  // TODO: Move this to sessions service
   private isSessionUpdated(session: Session, sessionDto: UpdateSessionDto): boolean {
     return (
       new Date(sessionDto.date).getTime() !== session.date.getTime() ||

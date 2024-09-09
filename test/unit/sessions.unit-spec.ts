@@ -33,55 +33,6 @@ describe('SessionsService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('addSession', () => {
-    it('should save a new session', async () => {
-      const movie: Movie = { id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66' } as Movie;
-      const createSessionDto = {
-        date: '2024-01-01',
-        timeSlot: '10:00-12:00' as TimeSlot,
-        roomNumber: 1,
-      };
-
-      jest.spyOn(repository, 'save').mockResolvedValue({} as Session);
-
-      const result = await service.addSession(createSessionDto, movie);
-
-      expect(result).toBeDefined();
-      expect(repository.save).toHaveBeenCalledWith(
-        expect.objectContaining({
-          date: new Date(createSessionDto.date),
-          timeSlot: createSessionDto.timeSlot,
-          roomNumber: createSessionDto.roomNumber,
-          movie: movie,
-        }),
-      );
-    });
-
-    it('should create a session with correct properties', async () => {
-      const movie: Movie = {
-        id: '4a7962f8-18f2-4c43-bbf3-34c1e5147c66',
-        name: 'Test Movie',
-      } as Movie;
-      const createSessionDto = {
-        date: '2024-01-01',
-        timeSlot: '10:00-12:00' as TimeSlot,
-        roomNumber: 1,
-      };
-
-      const savedSession = new Session(new Date(createSessionDto.date), createSessionDto.timeSlot, createSessionDto.roomNumber, movie);
-
-      jest.spyOn(repository, 'save').mockResolvedValue(savedSession);
-
-      const result = await service.addSession(createSessionDto, movie);
-
-      expect(result).toEqual(savedSession);
-      expect(result.date).toEqual(new Date(createSessionDto.date));
-      expect(result.timeSlot).toEqual(createSessionDto.timeSlot);
-      expect(result.roomNumber).toEqual(createSessionDto.roomNumber);
-      expect(result.movie).toEqual(movie);
-    });
-  });
-
   describe('deleteSession', () => {
     it('should delete a session by id', async () => {
       jest.spyOn(repository, 'delete').mockResolvedValue({ affected: 1 } as any);
@@ -234,23 +185,6 @@ describe('SessionsService', () => {
         }),
       ).rejects.toThrow('Database error');
     });
-  });
-
-  it('should add a new session to a movie', async () => {
-    const movie = new Movie('Inception', 13);
-    const createSessionDto = {
-      date: '2024-01-01',
-      timeSlot: '10:00-12:00' as TimeSlot,
-      roomNumber: 1,
-    };
-    const session = new Session(new Date(createSessionDto.date), createSessionDto.timeSlot, createSessionDto.roomNumber, movie);
-
-    jest.spyOn(repository, 'save').mockResolvedValue(session);
-
-    const result = await service.addSession(createSessionDto, movie);
-
-    expect(result).toEqual(session);
-    expect(repository.save).toHaveBeenCalledWith(expect.objectContaining({ movie }));
   });
 
   it('should delete a session by id', async () => {

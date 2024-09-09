@@ -29,7 +29,7 @@ export class SessionsController {
     if (!movie) {
       throw new MovieNotFoundError();
     }
-    const session = await this.sessionsService.addSession(createSessionDto, movie);
+    const session = await this.moviesService.addSessionToMovie(movie, createSessionDto);
     return new GenericResponseDto(session, 'The session has been successfully added.');
   }
 

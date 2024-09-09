@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, Repository } from 'typeorm';
 import { Session } from '@domain/sessions/entities/session.entity';
-import { CreateSessionDto } from '@api/sessions/dto/create-session.dto';
-import { Movie } from '@domain/movies/entities/movie.entity';
-import { MovieHasNoSessionsToDelete, SessionAlreadyExistsError, SessionNotFoundError } from '@domain/exceptions';
+import { MovieHasNoSessionsToDelete, SessionNotFoundError } from '@domain/exceptions';
 
 @Injectable()
 export class SessionsService {
@@ -12,16 +10,6 @@ export class SessionsService {
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
   ) {}
-
-  async addSession(session: CreateSessionDto, movie: Movie): Promise<Session> {
-    const newSession = new Session(new Date(session.date), session.timeSlot, session.roomNumber, movie);
-    return this.sessionRepository.save(newSession).catch((error) => {
-      if (error.code === '23505') {
-        throw new SessionAlreadyExistsError();
-      }
-      throw error;
-    });
-  }
 
   async deleteSession(id: string): Promise<{ result: boolean }> {
     const result = await this.sessionRepository.delete(id);

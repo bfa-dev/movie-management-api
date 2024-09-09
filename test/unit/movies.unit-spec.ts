@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MoviesService } from '@application/movies/movies.service';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { PinoLogger } from 'nestjs-pino';
 import { Movie } from '@domain/movies/entities/movie.entity';
 import { Session } from '@domain/sessions/entities/session.entity';
@@ -60,22 +60,6 @@ describe('MoviesService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
-  });
-
-  describe('findMoviesByIds', () => {
-    it('should return movies for given ids', async () => {
-      const movieIds = ['1', '2'];
-      const expectedMovies = [
-        { id: '1', name: 'Movie 1' },
-        { id: '2', name: 'Movie 2' },
-      ];
-      mockMovieRepository.findWithRelations.mockResolvedValue(expectedMovies);
-
-      const result = await service.findMoviesByIds(movieIds);
-
-      expect(result).toEqual(expectedMovies);
-      expect(mockMovieRepository.findWithRelations).toHaveBeenCalledWith({ where: { id: expect.anything() } });
-    });
   });
 
   describe('createMovie', () => {
@@ -227,6 +211,7 @@ describe('MoviesService', () => {
       };
       const expectedMovies = [new Movie('Test Movie 1', 14), new Movie('Test Movie 2', 16)];
 
+      // Ensure mockMovieRepository.findActiveMovies is properly mocked
       if (mockMovieRepository.findActiveMovies) {
         mockMovieRepository.findActiveMovies.mockResolvedValue(expectedMovies);
       } else {

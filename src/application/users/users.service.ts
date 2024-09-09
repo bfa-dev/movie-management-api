@@ -48,9 +48,7 @@ export class UsersService {
 
   async getWatchHistory(userId: string): Promise<Movie[]> {
     const usedTickets = await this.ticketsService.getUsersUsedTickets(userId);
-    console.log({ usedTickets });
     const movies = await this.moviesService.findMoviesByIds(usedTickets.map((ticket) => ticket.movieId));
-    console.log({movies})
     return movies;
   }
 
