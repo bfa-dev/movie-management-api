@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, ValidateNested } from 'class-validator';
+import { IsArray, IsUUID, ValidateNested } from 'class-validator';
 import { CreateMovieDto } from '../create-movie.dto';
 
 export class BulkCreateMovieDto {
@@ -14,5 +14,6 @@ export class BulkCreateMovieDto {
 export class BulkDeleteMovieDto {
   @ApiProperty({ type: [String] })
   @IsArray()
+  @IsUUID('4', { each: true })
   movieIds: string[];
 }

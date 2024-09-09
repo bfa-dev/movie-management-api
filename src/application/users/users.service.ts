@@ -1,12 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { User } from '@domain/users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { Role } from '@domain/auth/role.enum';
+import { Role } from '@domain/auth/enums/role.enum';
 import { IUserRepository } from '@domain/users/repositories/user-repository.interface';
 import { CreateUserDto } from '@api/users/dto/create-user.dto';
-import { Ticket } from '@domain/tickets/entities/ticket.entity';
 import { TicketsService } from '@application/tickets/tickets.service';
 import { FindOneOptions } from 'typeorm';
+import { UserNotFoundError } from '@domain/exceptions';
+import { Movie } from '@domain/movies/entities/movie.entity';
+import { MoviesService } from '@application/movies/movies.service';
 
 @Injectable()
 export class UsersService {
@@ -14,29 +16,26 @@ export class UsersService {
     @Inject('IUserRepository')
     private usersRepository: IUserRepository,
     private ticketsService: TicketsService,
+    private moviesService: MoviesService,
   ) { }
 
   async findOne(options: FindOneOptions<User>): Promise<User | undefined> {
-    return this.usersRepository.findOne(options);
+    const user = await this.usersRepository.findOne(options);
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+    return user;
   }
 
-  async updateOne(user: User): Promise<User> {
-    return this.usersRepository.save(user);
-  }
-
-  async findById(id: string): Promise<User | undefined> {
-    return this.usersRepository.findById(id);
-  }
-
-  async findByEmail(email: string): Promise<User | undefined> {
+  async findUserByEmail(email: string): Promise<User | undefined> {
     return this.usersRepository.findByEmail(email);
   }
 
-  async findByRole(role: Role): Promise<User[]> {
-    return this.usersRepository.findByRole(role);
+  async findUserByEmailWithPassword(email: string): Promise<User | undefined> {
+    return this.usersRepository.findByEmailWithPassword(email);
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = new User();
     user.username = createUserDto.username;
@@ -47,15 +46,13 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async getTicketsByUserId(userId: string): Promise<Ticket[]> {
-    return this.ticketsService.getTicketsByUserId(userId);
+  async getWatchHistory(userId: string): Promise<Movie[]> {
+    const usedTickets = await this.ticketsService.getUsersUsedTickets(userId);
+    const movies = await this.moviesService.findMoviesByIds(usedTickets.map(ticket => ticket.movieId));
+    return movies;
   }
 
-  async getUnusedTicketsByUserId(userId: string): Promise<Ticket[]> {
-    return this.ticketsService.getUnusedTicketsByUserId(userId);
-  }
-
-  async getWatchHistoryByUserId(userId: string): Promise<Ticket[]> {
-    return this.ticketsService.getWatchHistoryByUserId(userId);
+  async findByRole(role: Role): Promise<User[]> {
+    return this.usersRepository.findByRole(role);
   }
 }

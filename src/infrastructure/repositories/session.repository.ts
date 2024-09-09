@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, Repository } from 'typeorm';
-import { Session } from '@domain/movies/entities/session.entity';
-import { ISessionRepository } from '@domain/movies/repositories/session-repository.interface';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import { Session } from '@domain/sessions/entities/session.entity';
+import { ISessionRepository } from '@domain/sessions/repositories/session-repository.interface';
 
 @Injectable()
 export class SessionRepository implements ISessionRepository {
@@ -11,23 +11,27 @@ export class SessionRepository implements ISessionRepository {
     private readonly repository: Repository<Session>,
   ) { }
 
-  create(session: Partial<Session>): Session {
-    return this.repository.create(session);
-  }
-
   async save(session: Session): Promise<Session> {
     return this.repository.save(session);
   }
 
-  async findSessionByMovieIdAndSessionId(movieId: string, sessionId: string): Promise<Session | null> {
-    return this.repository.findOne({ where: { id: sessionId, movie: { id: movieId } } });
+  async findOne(id: string, options?: any): Promise<Session | null> {
+    return this.repository.findOne({ where: { id }, ...options });
   }
 
-  async findOne(options: FindOneOptions<Session>): Promise<Session | null> {
+  async findOneByOptions(options: FindOneOptions<Session>): Promise<Session | null> {
     return this.repository.findOne(options);
   }
 
-  async find(options?: any): Promise<Session[]> {
-    return this.repository.find(options);
+  async updateOne(id: string, partialSession: Partial<Session>): Promise<Session> {
+    const session = await this.repository.findOne({ where: { id } });
+    if (!session) {
+      throw new NotFoundException('Session not found');
+    }
+    return this.repository.save({ ...session, ...partialSession });
+  }
+
+  async delete(options?: any): Promise<void> {
+    await this.repository.delete(options);
   }
 }

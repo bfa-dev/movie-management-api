@@ -1,18 +1,18 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, JoinColumn } from 'typeorm';
 import { User } from '@domain/users/entities/user.entity';
-import { Session } from '../../movies/entities/session.entity';
+import { Session } from '@domain/sessions/entities/session.entity';
+import { Movie } from '@domain/movies/entities/movie.entity';
 
 @Entity()
 export class Ticket {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User, user => user.tickets, { onDelete: 'CASCADE' })
-  @JoinColumn()
-  user: User;
+  @Column()
+  userId: string;
 
-  @ManyToOne(() => Session)
-  session: Session;
+  @Column()
+  sessionId: string;
 
   @Column()
   movieId: string;

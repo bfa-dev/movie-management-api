@@ -1,20 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, ValidateNested } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { CreateSessionDto } from '../../sessions/dto/create-session.dto';
 
 export class CreateMovieDto {
-  @ApiProperty()
+  @ApiProperty({ example: 'Truva' })
+  @IsString()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 18 })
+  @IsInt()
   ageRestriction: number;
-}
 
-
-export class CreateMovieMultipleDto {
-  @ApiProperty()
+  @ApiProperty({ type: [CreateSessionDto], required: false })
+  @IsOptional()
   @IsArray()
-  @ValidateNested()
-  @Type(() => CreateMovieDto)
-  movies: CreateMovieDto[];
+  @ValidateNested({ each: true })
+  @Type(() => CreateSessionDto)
+  sessions: CreateSessionDto[];
 }

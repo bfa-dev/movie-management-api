@@ -1,17 +1,19 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Role } from '@domain/auth/role.enum';
+import { Role } from '@domain/auth/enums/role.enum';
 import { Ticket } from '@domain/tickets/entities/ticket.entity';
 import { Movie } from '@domain/movies/entities/movie.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column() // allowing duplicate usernames because email is unique
   username: string;
 
-  @Column()
+  @Exclude()
+  @Column({ select: false })
   password: string;
 
   @Column()
@@ -27,12 +29,12 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @OneToMany(() => Ticket, ticket => ticket.user)
+  @OneToMany(() => Ticket, ticket => ticket.userId)
   tickets: Ticket[];
 
   @ManyToMany(() => Movie)
   @JoinTable()
-  watchedMovies: Movie[];
+  watchedMovies: string[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

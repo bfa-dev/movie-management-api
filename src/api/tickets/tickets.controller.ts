@@ -1,24 +1,37 @@
-import { Controller, Get, Param, Req } from '@nestjs/common';
+import { Controller, Get, Param, Post } from '@nestjs/common';
 import { TicketsService } from '../../application/tickets/tickets.service'
-import { GetTicketByIdDto } from './dto/get-ticket-by-id.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Role } from '@domain/auth/role.enum';
+import { Role } from '@domain/auth/enums/role.enum';
 import { Roles } from '@application/decorators/roles.decorator';
-import { Public } from '@application/decorators/public.decorator';
+import { GenericResponseDto } from '@api/shared/dto/generic-response.dto';
+import { CurrentUser } from '@application/decorators/current-user.decorator';
+import { User } from '@domain/users/entities/user.entity';
+import { WatchMovieDto } from '@api/movies/dto/watch-movie.dto';
 
 @ApiTags('tickets')
-@ApiBearerAuth()
 @Controller('tickets')
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) { }
 
-  @Public()
-  @Get(':ticketId')
+  @Post(':sessionId/checkout')
+  @ApiBearerAuth()
   @Roles(Role.CUSTOMER, Role.MANAGER)
-  @ApiOperation({ summary: 'Get a ticket by ID' })
-  @ApiResponse({ status: 200, description: 'The ticket has been successfully retrieved.' })
+  @ApiOperation({ summary: 'Buy a ticket for a movie session' })
+  @ApiResponse({ status: 200, description: 'The ticket has been successfully bought.' })
+  @ApiResponse({ status: 400, description: 'Invalid movie ID or session ID.' })
+  async buyTicket(@CurrentUser() user: User, @Param('sessionId') sessionId: string) {
+    const ticket = await this.ticketsService.buyTicket(user, sessionId);
+    return new GenericResponseDto(ticket, 'The ticket has been successfully bought.');
+  }
+
+  @Post(':ticketId/watch')
+  @ApiBearerAuth()
+  @Roles(Role.CUSTOMER, Role.MANAGER)
+  @ApiOperation({ summary: 'Watch a movie using a ticket' })
+  @ApiResponse({ status: 200, description: 'The movie has been successfully watched.' })
   @ApiResponse({ status: 400, description: 'Invalid ticket ID.' })
-  async getTicket(@Param() getTicketByIdDto: GetTicketByIdDto) {
-    return this.ticketsService.findById(getTicketByIdDto.ticketId);
+  async watchMovie(@CurrentUser() user: User, @Param() watchMovieDto: WatchMovieDto) {
+    const movie = await this.ticketsService.watchMovie(user, watchMovieDto);
+    return new GenericResponseDto(movie, 'The movie has been successfully watched.');
   }
 }

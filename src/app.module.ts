@@ -7,10 +7,13 @@ import { RolesGuard } from '@application/guards/roles.guard';
 import { MoviesModule } from '@application/movies/movies.module';
 import { TicketsModule } from '@application/tickets/tickets.module';
 import { ConfigModule } from './infrastructure/config/config.module';
-import { CacheModule } from '@infrastructure/redis/redis.module';
 import { DatabaseModule } from '@infrastructure/database/database.module';
 import { BaseExceptionFilter } from '@application/filters';
 import { LoggingInterceptor, TimeoutInterceptor } from '@application/interceptors';
+import { HealthModule } from '@api/health/health.module';
+import { AppInitializerService } from '@application/lifecycle/app-initializer.service';
+import { LoggerModule, LoggerModuleAsyncParams } from 'nestjs-pino';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -20,9 +23,17 @@ import { LoggingInterceptor, TimeoutInterceptor } from '@application/interceptor
     UsersModule,
     MoviesModule,
     TicketsModule,
-    CacheModule,
+    HealthModule,
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        pinoHttp: configService.get('logger'),
+      }),
+    } as LoggerModuleAsyncParams),
   ],
   providers: [
+    AppInitializerService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

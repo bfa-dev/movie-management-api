@@ -3,15 +3,13 @@ const appVersion = process.env.APP_VERSION || '1.0.0';
 const env = process.env.NODE_ENV || 'dev';
 
 export default () => ({
-  app: {
-    name: appName,
-    version: appVersion,
-    env: env,
-  },
+  appName,
+  appVersion,
+  env,
   database: {
     url: process.env.DATABASE_URL,
     type: 'postgres',
-    synchronize: false, // Set to false for all environments by default
+    synchronize: false,
     entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
   },
   redis: {
@@ -31,3 +29,5 @@ export default () => ({
   },
   timeout: 10000,
 });
+
+
