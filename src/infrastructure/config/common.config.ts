@@ -6,15 +6,6 @@ export default () => ({
   appName,
   appVersion,
   env,
-  database: {
-    url: process.env.DATABASE_URL,
-    type: 'postgres',
-    synchronize: false,
-    entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
-  },
-  redis: {
-    url: process.env.REDIS_URL,
-  },
   jwt: {
     secret: process.env.JWT_SECRET,
     expirationTime: process.env.JWT_EXPIRATION_TIME,

@@ -209,7 +209,7 @@ Before you begin, ensure you have the following installed on your system:
 Redis is an open-source, in-memory data structure store that is used as a database, cache, and message broker. To install Redis using Docker, follow these steps:
 
 ```bash
-docker compose up local-db -d              
+docker compose up db -d              
 ```
 
 This command will download the PostgreSQL:13 image from Docker Hub and run it in a Docker container named `movie-management-case`
@@ -221,7 +221,7 @@ To verify that the installations were successful, you can use Docker commands to
 ```bash 
 docker ps
 ```
-This command will list all running Docker containers. You should see containers named `movie-management-case-local-db-1` with the image `postgres:13` in the list.
+This command will list all running Docker containers. You should see containers named `movie-management-case` with the image `postgres` in the list.
 
 ### 3. Installing Dependencies
 
