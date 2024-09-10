@@ -1,0 +1,164 @@
+{
+  "movies": [
+    {
+      "name": "Truva",
+      "ageRestriction": 18,
+      "sessions": [
+        {
+          "date": "2024-01-01",
+          "timeSlot": "10:00-12:00",
+          "roomNumber": 1
+        },
+        {
+          "date": "2024-01-02",
+          "timeSlot": "14:00-16:00",
+          "roomNumber": 2
+        }
+      ]
+    },
+    {
+      "name": "Gladiator",
+      "ageRestriction": 16,
+      "sessions": [
+        {
+          "date": "2024-01-03",
+          "timeSlot": "12:00-14:00",
+          "roomNumber": 1
+        },
+        {
+          "date": "2024-01-04",
+          "timeSlot": "16:00-18:00",
+          "roomNumber": 3
+        }
+      ]
+    },
+    {
+      "name": "Toy Story",
+      "ageRestriction": 6,
+      "sessions": [
+        {
+          "date": "2024-02-01",
+          "timeSlot": "10:00-12:00",
+          "roomNumber": 1
+        },
+        {
+          "date": "2024-02-02",
+          "timeSlot": "14:00-16:00",
+          "roomNumber": 2
+        }
+      ]
+    },
+    {
+      "name": "Frozen",
+      "ageRestriction": 3,
+      "sessions": [
+        {
+          "date": "2025-02-03",
+          "timeSlot": "10:00-12:00",
+          "roomNumber": 1
+        },
+        {
+          "date": "2025-02-04",
+          "timeSlot": "14:00-16:00",
+          "roomNumber": 2
+        }
+      ]
+    },
+    {
+      "name": "Interstellar",
+      "ageRestriction": 12,
+      "sessions": [
+        {
+          "date": "2025-03-01",
+          "timeSlot": "18:00-20:00",
+          "roomNumber": 1
+        },
+        {
+          "date": "2025-03-02",
+          "timeSlot": "20:00-22:00",
+          "roomNumber": 2
+        }
+      ]
+    },
+    {
+      "name": "Star Wars: A New Hope",
+      "ageRestriction": 10,
+      "sessions": [
+        {
+          "date": "2025-03-03",
+          "timeSlot": "12:00-14:00",
+          "roomNumber": 1
+        },
+        {
+          "date": "2025-03-04",
+          "timeSlot": "16:00-18:00",
+          "roomNumber": 3
+        }
+      ]
+    },
+    {
+      "name": "The Conjuring",
+      "ageRestriction": 18,
+      "sessions": [
+        {
+          "date": "2025-04-01",
+          "timeSlot": "22:00-00:00",
+          "roomNumber": 5
+        },
+        {
+          "date": "2025-04-02",
+          "timeSlot": "23:59-02:00",
+          "roomNumber": 6
+        }
+      ]
+    },
+    {
+      "name": "Get Out",
+      "ageRestriction": 16,
+      "sessions": [
+        {
+          "date": "2025-04-03",
+          "timeSlot": "20:00-22:00",
+          "roomNumber": 4
+        },
+        {
+          "date": "2025-04-04",
+          "timeSlot": "20:00-22:00",
+          "roomNumber": 3
+        }
+      ]
+    },
+    {
+      "name": "Crazy Rich Asians",
+      "ageRestriction": 12,
+      "sessions": [
+        {
+          "date": "2025-05-01",
+          "timeSlot": "14:00-16:00",
+          "roomNumber": 2
+        },
+        {
+          "date": "2025-05-02",
+          "timeSlot": "20:00-22:00",
+          "roomNumber": 1
+        }
+      ]
+    },
+    {
+      "name": "La La Land",
+      "ageRestriction": 10,
+      "sessions": [
+        {
+          "date": "2025-05-03",
+          "timeSlot": "10:00-12:00",
+          "roomNumber": 3
+        },
+        {
+          "date": "2025-05-04",
+          "timeSlot": "18:00-20:00",
+          "roomNumber": 2
+        }
+      ]
+    }
+  ]
+}
