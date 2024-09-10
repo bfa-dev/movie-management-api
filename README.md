@@ -363,5 +363,5 @@ $ npm run test:cov:e2e
 3. Language support
 
 ### Challenges
-	1. This project marked my first experience using a SQL database at this scale, especially with such intricate relationships. The decision to use a relational database was driven by the natural fit between the entities involved—users, tickets, movies, and sessions—all of which have strong interdependencies. Despite the learning curve, this choice proved crucial for maintaining data integrity and enabling robust query capabilities across these related entities.
+  1.This project marked my first experience using a SQL database at this scale, especially with such relationships. The decision to use a relational database was driven by the natural fit between the entities involved—users, tickets, movies, and sessions—all of which have strong interdependencies. Despite the learning curve, this choice proved crucial for maintaining data integrity and enabling robust query capabilities across these related entities.
   2.	Deployment on Google Cloud Services has been unsuccessful because my billing account was suspended due to some suspicious activity. I haven’t had the time to explore other platforms yet, but I plan to resume deployment on Google Cloud once the billing issue is resolved.
