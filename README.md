@@ -277,8 +277,6 @@ $ npm run start
 $ npm run start:dev
 ```
 
-#### - If you are done with here, you can move to [Accessing The Application](#accessing-the-application) section.
-
 # Accessing the Application
 Once the containers are up and running, you can access the application at `http://localhost:8080`.
 
@@ -286,9 +284,9 @@ Once the containers are up and running, you can access the application at `http:
 
 ![Swagger Documentation Interface](./assets/SwaggerUI.jpeg)
 
-## 1. Infrastructure Discovery
+# Infrastructure Discovery
 
-- ### 2.1 Inspecting PostgreSQL
+- ### 1.1 Inspecting PostgreSQL
 
   Sample DB content like that:
 
