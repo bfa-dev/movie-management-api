@@ -337,12 +337,15 @@ $ npm run test:cov:e2e
 ```
 
 Provided e2e Tests for AuthController:
+
 	1.	Register a new user successfully.
 	2.	Login with valid credentials successfully.
 	3.	Fail to login with invalid credentials (unauthorized).
 	4.	Fail to create a manager without authorization (unauthorized).
 	5.	Successfully create a new manager with authorization.
+
 Provided e2e Tests for MoviesController:
+
 	1.	Create a movie with sessions using manager authorization (successful).
 	2.	Fail to create a movie without any authorization (unauthorized).
 	3.	Fail to create a movie with user authorization (forbidden).
@@ -357,14 +360,18 @@ Provided e2e Tests for MoviesController:
 	12.	Delete a movie by ID using manager authorization (successful).
 	13.	Fail to delete a movie without any authorization (unauthorized).
 	14.	Fail to delete a movie with user authorization (forbidden).
+
 Provided e2e Tests for SessionsController:
+
 	1.	Create a session for a movie using manager authorization (successful).
 	2.	Fail to create a session for a movie without any authorization (unauthorized).
 	3.	Fail to create a session for a movie using user authorization (forbidden).
 	4.	Delete a session using manager authorization (successful).
 	5.	Fail to delete a session using user authorization (forbidden).
 	6.	Fail to delete a session without any authorization (unauthorized).
+
 Provided e2e Tests for TicketsController:
+
 	1.	Fail to buy a ticket because the user is not old enough (age restriction).
 	2.	Successfully buy a ticket because the user is old enough.
 	3.	Fail to buy a ticket because the session has already passed.
