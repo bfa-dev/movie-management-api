@@ -336,6 +336,45 @@ The following commands are executed automatically when running the E2E tests. Af
 $ npm run test:cov:e2e
 ```
 
+Provided e2e Tests for AuthController:
+	1.	Register a new user successfully.
+	2.	Login with valid credentials successfully.
+	3.	Fail to login with invalid credentials (unauthorized).
+	4.	Fail to create a manager without authorization (unauthorized).
+	5.	Successfully create a new manager with authorization.
+Provided e2e Tests for MoviesController:
+	1.	Create a movie with sessions using manager authorization (successful).
+	2.	Fail to create a movie without any authorization (unauthorized).
+	3.	Fail to create a movie with user authorization (forbidden).
+	4.	Get all movies (successful).
+	5.	Get a movie by ID (successful).
+	6.	Update a movie with sessions using manager authorization (successful).
+	7.	Fail to update a movie without any authorization (unauthorized).
+	8.	Fail to update a movie with user authorization (forbidden).
+	9.	Bulk add movies with sessions using manager authorization (successful).
+	10.	Fail to bulk add movies with conflicting sessions (transaction rollback, conflict).
+	11.	Bulk delete movies using manager authorization (successful).
+	12.	Delete a movie by ID using manager authorization (successful).
+	13.	Fail to delete a movie without any authorization (unauthorized).
+	14.	Fail to delete a movie with user authorization (forbidden).
+Provided e2e Tests for SessionsController:
+	1.	Create a session for a movie using manager authorization (successful).
+	2.	Fail to create a session for a movie without any authorization (unauthorized).
+	3.	Fail to create a session for a movie using user authorization (forbidden).
+	4.	Delete a session using manager authorization (successful).
+	5.	Fail to delete a session using user authorization (forbidden).
+	6.	Fail to delete a session without any authorization (unauthorized).
+Provided e2e Tests for TicketsController:
+	1.	Fail to buy a ticket because the user is not old enough (age restriction).
+	2.	Successfully buy a ticket because the user is old enough.
+	3.	Fail to buy a ticket because the session has already passed.
+	4.	Manager successfully buys a ticket.
+	5.	Fail to buy a ticket without user authorization (unauthorized).
+	6.	Manager successfully watches a movie with a valid ticket.
+	7.	Fail to watch a movie with a ticket that has already been used (manager).
+	8.	User successfully watches a movie with a valid ticket.
+	9.	Fail to watch a movie with a ticket that has already been used (user).
+
 ![Unit Test](./assets/e2e.test.cov.png)
 
 ![Unit Test2](./assets/e2e.test.cov2.png)
