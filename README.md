@@ -18,8 +18,8 @@ Before you begin, ensure you have the following installed:
 
 # Sample Application Showcase
 
-- #### `App Initilizer` Flow
-    App Initilizer runs when the application starts. It registers an admin manager user using environment variables to the database.
+- #### `App Initializer` Flow
+    App Initializer runs when the application starts. It registers an admin manager user using environment variables to the database.
     Its because only manager can create managers and some of the endpoints are protected from customers.
     It also registers a customer just for easy test purposes.
 
@@ -398,7 +398,7 @@ Provided e2e Tests for TicketsController:
 
 3. Scalability and Performance
 	•	Database Optimization and Indexes
-	•	Caching: Implement caching strategies (e.g., fecthing all movies, customer tokens)
+	•	Caching: Implement caching strategies (e.g., fetching all movies, customer tokens)
 
 4. Event-Driven Architecture
 	•	Implement Event Sourcing: Introduce an event-driven architecture to handle complex business logic, such as ticketing or session scheduling, which could benefit from asynchronous processing and better decoupling.
@@ -410,4 +410,5 @@ Provided e2e Tests for TicketsController:
 
 ### Challenges
   1.This project marked my first experience using a SQL database at this scale, especially with such relationships. The decision to use a relational database was driven by the natural fit between the entities involved—users, tickets, movies, and sessions—all of which have strong interdependencies. Despite the learning curve, this choice proved crucial for maintaining data integrity and enabling robust query capabilities across these related entities.
-  2.	Deployment on Google Cloud Services has been unsuccessful because my billing account was suspended due to some suspicious activity. I haven’t had the time to explore other platforms yet, but I plan to resume deployment on Google Cloud once the billing issue is resolved.
+  
+  2.Deployment on Google Cloud Services has been unsuccessful because my billing account was suspended due to some suspicious activity. I haven’t had the time to explore other platforms yet, but I plan to resume deployment on Google Cloud once the billing issue is resolved.

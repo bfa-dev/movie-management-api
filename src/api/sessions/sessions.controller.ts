@@ -6,7 +6,6 @@ import { GenericResponseDto } from '@api/shared/dto/generic-response.dto';
 import { SessionsService } from '@application/sessions/sessions.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { MoviesService } from '@application/movies/movies.service';
-import { MovieNotFoundError } from '@domain/exceptions';
 import { MovieIdDto } from '@api/movies/dto/movie-id-dto';
 import { SessionIdDto } from './dto/session-id-dto';
 
@@ -26,9 +25,6 @@ export class SessionsController {
   @ApiResponse({ status: 409, description: 'This room is already booked for the given date and time slot.' })
   async addSession(@Param() params: MovieIdDto, @Body() createSessionDto: CreateSessionDto) {
     const movie = await this.moviesService.getMovieById(params.movieId);
-    if (!movie) {
-      throw new MovieNotFoundError();
-    }
     const session = await this.moviesService.addSessionToMovie(movie, createSessionDto);
     return new GenericResponseDto(session, 'The session has been successfully added.');
   }
