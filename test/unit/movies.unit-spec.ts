@@ -95,6 +95,7 @@ describe('MoviesService', () => {
         name: 'Updated Movie',
         ageRestriction: 16,
         sessions: [],
+        isActive: false,
       };
 
       const existingMovie = new Movie('Old Movie', 12);
@@ -117,6 +118,7 @@ describe('MoviesService', () => {
         name: 'Updated Movie',
         ageRestriction: 16,
         sessions: [],
+        isActive: false,
       };
 
       mockMovieRepository.findOneById.mockResolvedValue(null);

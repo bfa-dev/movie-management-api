@@ -101,7 +101,7 @@ export class MoviesService {
   }
 
   private isMovieUpdated(movie: Movie, movieDto: UpdateMovieDto): boolean {
-    return movie.name !== movieDto.name || movie.ageRestriction !== movieDto.ageRestriction;
+    return movie.name !== movieDto.name || movie.ageRestriction !== movieDto.ageRestriction || movie.isActive !== movieDto.isActive;
   }
 
   private async updateMovieSessions(sessions: UpdateSessionDto[]): Promise<void> {
@@ -130,7 +130,7 @@ export class MoviesService {
   }
 
   async updateMovie(id: string, updateMovieDto: UpdateMovieDto): Promise<Movie> {
-    const { name, ageRestriction, sessions } = updateMovieDto;
+    const { name, ageRestriction, isActive, sessions } = updateMovieDto;
     const movie = await this.movieRepository.findOneById(id);
     if (!movie) {
       throw new MovieNotFoundError();
@@ -146,6 +146,7 @@ export class MoviesService {
       Object.assign(movie, {
         name,
         ageRestriction,
+        isActive,
       });
       await this.movieRepository.save(movie);
     }
