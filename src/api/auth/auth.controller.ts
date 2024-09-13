@@ -16,7 +16,6 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  @UsePipes()
   @ApiOperation({ summary: 'User login' })
   @ApiResponse({ status: 200, description: 'Return JWT access token' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
