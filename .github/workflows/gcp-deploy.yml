@@ -31,11 +31,12 @@ jobs:
       run: |
         docker build -t gcr.io/${{ env.PROJECT_ID }}/movie-management-api:${{ github.sha }} .
         docker push gcr.io/${{ env.PROJECT_ID }}/movie-management-api:${{ github.sha }}
-        - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy movie-management-api \
-            --image gcr.io/${{ env.PROJECT_ID }}/movie-management-api:${{ github.sha }} \
-            --platform managed \
-            --region europe-west1 \
-            --allow-unauthenticated \
-            --set-env-vars="NODE_ENV=prod,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},JWT_EXPIRATION_TIME=${{ secrets.JWT_EXPIRATION_TIME }},INITIAL_MANAGER_EMAIL=${{ secrets.INITIAL_MANAGER_EMAIL }},INITIAL_MANAGER_PASSWORD=${{ secrets.INITIAL_MANAGER_PASSWORD }},INITIAL_MANAGER_USERNAME=${{ secrets.INITIAL_MANAGER_USERNAME }},INITIAL_USER_EMAIL=${{ secrets.INITIAL_USER_EMAIL }},INITIAL_USER_PASSWORD=${{ secrets.INITIAL_USER_PASSWORD }},INITIAL_USER_USERNAME=${{ secrets.INITIAL_USER_USERNAME }}"
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy movie-management-api \
+          --image gcr.io/${{ env.PROJECT_ID }}/movie-management-api:${{ github.sha }} \
+          --platform managed \
+          --region europe-west1 \
+          --allow-unauthenticated \
+          --set-env-vars="NODE_ENV=prod,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},JWT_EXPIRATION_TIME=${{ secrets.JWT_EXPIRATION_TIME }},INITIAL_MANAGER_EMAIL=${{ secrets.INITIAL_MANAGER_EMAIL }},INITIAL_MANAGER_PASSWORD=${{ secrets.INITIAL_MANAGER_PASSWORD }},INITIAL_MANAGER_USERNAME=${{ secrets.INITIAL_MANAGER_USERNAME }},INITIAL_USER_EMAIL=${{ secrets.INITIAL_USER_EMAIL }},INITIAL_USER_PASSWORD=${{ secrets.INITIAL_USER_PASSWORD }},INITIAL_USER_USERNAME=${{ secrets.INITIAL_USER_USERNAME }}"
