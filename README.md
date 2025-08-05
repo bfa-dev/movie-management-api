@@ -1,7 +1,7 @@
 Movie Management API
 
 Access the publicly deployed Movie Management API on Google Cloud here. (Not available right now)
-~ https://movie-management-api-395979430991.europe-west1.run.app/api#/ ~
+~~https://movie-management-api-395979430991.europe-west1.run.app/api#/~~
 
 ## Description
 
